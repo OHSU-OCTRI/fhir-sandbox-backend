@@ -17,6 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Disabled integration tests in GitHub Actions workflow (RFS-253)
 - Configured GitHub Actions to cache Maven dependencies (RFS-253)
 - Change `groupId` and `artifactId` in `pom.xml` (RFS-253)
+- Enable partitioning by default (RFS-253)
+- Use OCTRI configuration conventions (RFS-253)
+- Ensure unit tests work when `dev.yaml` is present (RFS-253)
 
 ### Removed
 
