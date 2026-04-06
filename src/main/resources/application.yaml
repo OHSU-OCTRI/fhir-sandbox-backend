@@ -88,6 +88,9 @@ spring:
   # -------------------------------------------------------------------------------
   # B. Core Spring
   # -------------------------------------------------------------------------------
+  config:
+    import: "optional:dev.yaml"
+
   main:
     allow-bean-definition-overriding: false
     allow-circular-references: true
@@ -356,13 +359,13 @@ hapi:
     # -------------------------------------------------------------------------------
     # J. Partitioning & Multitenancy
     # -------------------------------------------------------------------------------
-    # partitioning:
-    #   allow_references_across_partitions: false
-    #   partitioning_include_in_search_hashes: false
-    #   default_partition_id: 0
-    # database_partition_mode_enabled: true
-    # patient_id_partitioning_mode: true
-    # request_tenant_partitioning_mode: false
+    partitioning:
+      allow_references_across_partitions: false
+      partitioning_include_in_search_hashes: false
+      default_partition_id: 0
+      database_partition_mode_enabled: true
+      patient_id_partitioning_mode: false
+      request_tenant_partitioning_mode: true
 
     # -------------------------------------------------------------------------------
     # K. CORS
@@ -394,10 +397,10 @@ hapi:
     # -------------------------------------------------------------------------------
     # comma-separated package names, will be @ComponentScan'ed by Spring to allow for creating custom Spring beans
 
-    # custom-bean-packages:
+    custom-bean-packages: org.octri.fhir_sandbox_backend
     # custom-interceptor-classes:
     # custom-provider-classes:
-    
+
     # store_meta_source_information: NONE
     # bundle_batch_pool_size: 10
     # bundle_batch_pool_max_size: 50
@@ -469,7 +472,7 @@ hapi:
     # R. LastN (analytics)
     # -------------------------------------------------------------------------------
     # lastn_enabled: true
-    
+
     # -------------------------------------------------------------------------------
     # S. Testers (webui)
     # -------------------------------------------------------------------------------
