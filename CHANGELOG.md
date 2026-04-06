@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Disabled integration tests in GitHub Actions workflow (RFS-253)
 - Configured GitHub Actions to cache Maven dependencies (RFS-253)
+- Change `groupId` and `artifactId` in `pom.xml` (RFS-253)
 
 ### Removed
 
