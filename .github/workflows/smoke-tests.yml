@@ -27,7 +27,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: 17
-          distribution: zulu
+          distribution: temurin
 
       - name: Build with Maven
         env:
@@ -50,7 +50,7 @@ jobs:
         if: always()
         run: |
           echo "===== Last 200 Lines of Server Log ====="
-          tail -n 200 logs/server.log || true    
+          tail -n 200 logs/server.log || true
 
       - name: Highlight server errors
         if: always()
