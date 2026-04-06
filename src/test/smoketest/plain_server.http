@@ -1,6 +1,6 @@
 ### Create Single Patient
 # https://hapifhir.io/hapi-fhir/docs/server_plain/rest_operations.html#type_create
-POST http://{{host}}/fhir/Patient
+POST http://{{host}}/fhir/DEFAULT/Patient
 Content-Type: application/json
 
 < smoketestfiles/patient_create.json
@@ -23,7 +23,7 @@ Content-Type: application/json
 
 ### Search Single Patient
 # https://hapifhir.io/hapi-fhir/docs/server_plain/rest_operations.html#type_search
-GET http://{{host}}/fhir/Patient?name={{single_patient_family_name}}&_id={{single_patient_id}}
+GET http://{{host}}/fhir/DEFAULT/Patient?name={{single_patient_family_name}}&_id={{single_patient_id}}
 
 > {%
     client.test("Patient search successful", function() {
@@ -45,7 +45,7 @@ GET http://{{host}}/fhir/Patient?name={{single_patient_family_name}}&_id={{singl
 
 ### Delete Patient
 # https://hapifhir.io/hapi-fhir/docs/server_plain/rest_operations.html#instance_delete
-DELETE http://{{host}}/fhir/Patient/{{single_patient_id}}
+DELETE http://{{host}}/fhir/DEFAULT/Patient/{{single_patient_id}}
 
 > {%
     client.test("Patient deleted successfully", function() {
@@ -63,7 +63,7 @@ DELETE http://{{host}}/fhir/Patient/{{single_patient_id}}
 
 ### Batch Patient Create
 # https://hapifhir.io/hapi-fhir/docs/server_plain/rest_operations.html#system_transaction
-POST http://{{host}}/fhir/
+POST http://{{host}}/fhir/DEFAULT/
 Content-Type: application/json
 
 < smoketestfiles/patient_batch_create.json
@@ -94,7 +94,7 @@ Content-Type: application/json
 
 ### Update - Instance
 # https://hapifhir.io/hapi-fhir/docs/server_plain/rest_operations.html#instance_update
-PUT http://{{host}}/fhir/Patient/{{batch_patient_id}}
+PUT http://{{host}}/fhir/DEFAULT/Patient/{{batch_patient_id}}
 Content-Type: application/json
 
 < smoketestfiles/patient_update.json
@@ -123,7 +123,7 @@ Content-Type: application/json
 
 ### Patch - Instance
 # https://hapifhir.io/hapi-fhir/docs/server_plain/rest_operations.html#instance-level-patch
-PATCH http://{{host}}/fhir/Patient/{{batch_patient_id}}
+PATCH http://{{host}}/fhir/DEFAULT/Patient/{{batch_patient_id}}
 Content-Type: application/json-patch+json
 
 < smoketestfiles/patient_patch.json
@@ -148,7 +148,7 @@ Content-Type: application/json-patch+json
 
 ### History - Server/Type/Instance
 # https://hapifhir.io/hapi-fhir/docs/server_plain/rest_operations.html#history
-GET http://{{host}}/fhir/Patient/{{batch_patient_id}}/_history
+GET http://{{host}}/fhir/DEFAULT/Patient/{{batch_patient_id}}/_history
 
 > {%
     client.test("History completed successfully", function() {
@@ -170,7 +170,7 @@ GET http://{{host}}/fhir/Patient/{{batch_patient_id}}/_history
 
 ### Capability Statement
 # https://hapifhir.io/hapi-fhir/docs/server_plain/rest_operations.html#system_capabilities
-GET http://{{host}}/fhir/metadata
+GET http://{{host}}/fhir/DEFAULT/metadata
 
 > {%
     client.test("CapabilityStatement fetched successfully", function() {
@@ -188,7 +188,7 @@ GET http://{{host}}/fhir/metadata
 
 ### Extended Operations - everything
 # https://hapifhir.io/hapi-fhir/docs/server_plain/rest_operations_operations.html
-GET http://{{host}}/fhir/Patient/{{batch_patient_id}}/$everything
+GET http://{{host}}/fhir/DEFAULT/Patient/{{batch_patient_id}}/$everything
 
 > {%
     client.test("$everything operation successful", function() {
@@ -207,7 +207,7 @@ GET http://{{host}}/fhir/Patient/{{batch_patient_id}}/$everything
 ### Extended Operations - validate
 # https://hapifhir.io/hapi-fhir/docs/server_plain/rest_operations_operations.html
 # @timeout 180   # wait up to 2 minutes for the validate response
-POST http://{{host}}/fhir/Patient/{{batch_patient_id}}/$validate
+POST http://{{host}}/fhir/DEFAULT/Patient/{{batch_patient_id}}/$validate
 
 > {%
     client.test("$validate operation successful", function() {
