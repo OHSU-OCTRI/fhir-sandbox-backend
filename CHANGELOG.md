@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial commit including code forked from [hapifhir/hapi-fhir-jpaserver-starter](https://github.com/hapifhir/hapi-fhir-jpaserver-starter) (RFS-253)
 - Added `RUNNING.md` with instructions on how to configure and run the application for development (RFS-255)
+- Added initial implementation of the `/.well-known/smart-configuration` endpoint
 
 ### Changed
 

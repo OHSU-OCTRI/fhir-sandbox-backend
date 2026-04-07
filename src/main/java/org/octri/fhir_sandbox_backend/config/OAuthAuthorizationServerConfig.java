@@ -1,6 +1,7 @@
 package org.octri.fhir_sandbox_backend.config;
 
 import org.octri.fhir_sandbox_backend.interceptor.CapabilityStatementCustomizer;
+import org.octri.fhir_sandbox_backend.interceptor.SmartWellKnownInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -24,6 +25,7 @@ public class OAuthAuthorizationServerConfig {
 		log.info("Initializing OAuthAuthorizationServerConfig with properties: {}", properties);
 		this.properties = properties;
 		restfulServer.registerInterceptor(this.capabilityStatementCustomizer());
+		restfulServer.registerInterceptor(this.smartWellKnownInterceptor());
 	}
 
 	private CapabilityStatementCustomizer capabilityStatementCustomizer() {
@@ -33,6 +35,12 @@ public class OAuthAuthorizationServerConfig {
 			this.properties.getAuthorizeAddress(),
 			this.properties.getTokenAddress()
 		);
+	}
+
+	private SmartWellKnownInterceptor smartWellKnownInterceptor() {
+		log.debug("Creating SmartWellKnownInterceptor with authorizeAddress={} and tokenAddress={}",
+			this.properties.getAuthorizeAddress(), this.properties.getTokenAddress());
+		return new SmartWellKnownInterceptor(this.properties);
 	}
 
 }

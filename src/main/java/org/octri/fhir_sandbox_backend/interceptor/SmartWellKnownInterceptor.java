@@ -1,0 +1,109 @@
+package org.octri.fhir_sandbox_backend.interceptor;
+
+import java.io.IOException;
+
+import org.apache.commons.lang3.StringUtils;
+import org.octri.fhir_sandbox_backend.config.OAuthAuthorizationServerProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import ca.uhn.fhir.interceptor.api.Hook;
+import ca.uhn.fhir.interceptor.api.Interceptor;
+import ca.uhn.fhir.interceptor.api.Pointcut;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+/**
+ * Custom interceptor that handles requests to the SMART configuration endpoint
+ * (/.well-known/smart-configuration).
+ *
+ * Based on the following example implementations:
+ * <ul>
+ * <li><a href="https://github.com/mcode/smart-backend-auth">mCODE SMART Backend
+ * Auth</a></li>
+ * <li><a href="https://groups.google.com/g/hapi-fhir/c/9b1djB7AW_E">HAPI FHIR Google Group discussion on SMART configuration</a></li>
+ * </ul>
+ *
+ * @see <a
+ *      href="https://hl7.org/fhir/smart-app-launch/app-launch.html">SMART App
+ *      Launch and Authorization</a>
+ * @see <a
+ *      href=
+ *      "https://build.fhir.org/ig/HL7/smart-app-launch/conformance.html">SMART
+ *      App Launch Conformance</a>
+ */
+@Interceptor
+public class SmartWellKnownInterceptor {
+
+	private static final Logger log = LoggerFactory.getLogger(SmartWellKnownInterceptor.class);
+
+	private static final String AUTHORIZATION_ENDPOINT_KEY = "authorization_endpoint";
+	private static final String CAPABILITIES_KEY = "capabilities";
+	private static final String CODE_CHALLENGE_METHODS_SUPPORTED_KEY = "code_challenge_methods_supported";
+	private static final String GRANT_TYPES_SUPPORTED_KEY = "grant_types_supported";
+	private static final String JWK_SET_URI_KEY = "jwks_uri";
+	private static final String REGISTRATION_ENDPOINT_KEY = "registration_endpoint";
+	private static final String S256_CODE_CHALLENGE_METHOD = "S256";
+	private static final String TOKEN_ENDPOINT_KEY = "token_endpoint";
+
+	private final ObjectMapper objectMapper = new ObjectMapper();
+	private final OAuthAuthorizationServerProperties properties;
+
+	public SmartWellKnownInterceptor(OAuthAuthorizationServerProperties properties) {
+		this.properties = properties;
+	}
+
+	@Hook(Pointcut.SERVER_INCOMING_REQUEST_PRE_PROCESSED)
+	public boolean processIncomingRequest(HttpServletRequest request, HttpServletResponse response) {
+		String requestURI = request.getRequestURI();
+		log.info("Received request for URI: {}", requestURI);
+
+		// TODO: Consider smarter URI matching
+		if (requestURI.endsWith("/.well-known/smart-configuration")) {
+			log.debug("Handling SMART configuration request");
+			response.setContentType("application/json");
+			response.setCharacterEncoding("UTF-8");
+
+			ObjectNode smartConfig = objectMapper.createObjectNode();
+			smartConfig.put(AUTHORIZATION_ENDPOINT_KEY, this.properties.getAuthorizeAddress());
+			smartConfig.put(TOKEN_ENDPOINT_KEY, this.properties.getTokenAddress());
+
+			smartConfig.putArray(GRANT_TYPES_SUPPORTED_KEY)
+				.add("authorization_code")
+				.add("urn:ietf:params:oauth:grant-type:jwt-bearer");
+			smartConfig.putArray(CODE_CHALLENGE_METHODS_SUPPORTED_KEY)
+				.add(S256_CODE_CHALLENGE_METHOD);
+
+			// TODO: advertise supported scopes (launch, etc.)
+
+			// TODO: RFS-249 add EHR launch
+			// TODO: RFS-257 support confidential clients
+			smartConfig.putArray(CAPABILITIES_KEY)
+				.add("launch-standalone")
+				.add("client-public");
+
+			if (!StringUtils.isEmpty(this.properties.getRegisterAddress())) {
+				smartConfig.put(REGISTRATION_ENDPOINT_KEY, this.properties.getRegisterAddress());
+			}
+
+			if (!StringUtils.isEmpty(this.properties.getJwkSetAddress())) {
+				smartConfig.put(JWK_SET_URI_KEY, this.properties.getJwkSetAddress());
+			}
+
+			try {
+				response.getWriter().write(objectMapper.writeValueAsString(smartConfig));
+				response.setStatus(HttpServletResponse.SC_OK);
+			} catch (IOException e) {
+				log.error("Error writing SMART configuration response", e);
+				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			}
+			return false; // We've handled the request, no need to continue processing
+		}
+
+		return true; // Not our endpoint, continue processing
+	}
+
+}
