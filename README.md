@@ -346,7 +346,7 @@ To configure the starter app to use PostgreSQL, instead of the default H2, updat
 ```yaml
 spring:
   datasource:
-    url: 'jdbc:postgresql://localhost:5432/hapi'
+    url: 'jdbc:postgresql://localhost:55432/hapi'
     username: admin
     password: admin
     driverClassName: org.postgresql.Driver

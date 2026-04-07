@@ -27,7 +27,7 @@ services:
     container_name: hapi-fhir-postgres
     restart: always
     ports:
-      - "5432:5432"
+      - "55432:5432"
     environment:
       POSTGRES_DB: "hapi"
       POSTGRES_USER: "admin"

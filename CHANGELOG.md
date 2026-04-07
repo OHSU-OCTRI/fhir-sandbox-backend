@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enable partitioning by default (RFS-253)
 - Use OCTRI configuration conventions (RFS-253)
 - Ensure unit tests work when `dev.yaml` is present (RFS-253)
+- Remap PostgreSQL port to avoid conflict with existing applications (RFS-253)
 
 ### Removed
 
