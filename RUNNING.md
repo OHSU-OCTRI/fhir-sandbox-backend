@@ -13,7 +13,7 @@ Copy `env.sample` to `.env` and update as desired. The default `.env` values set
 SERVER_PORT=8000
 
 # Database configuration - these are the defaults used in docker-compose.yml
-SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/hapi
+SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:55432/hapi
 SPRING_DATASOURCE_USERNAME=admin
 SPRING_DATASOURCE_PASSWORD=admin
 SPRING_DATASOURCE_DRIVERCLASSNAME=org.postgresql.Driver
@@ -42,7 +42,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/hapi
+    url: jdbc:postgresql://localhost:55432/hapi
     username: admin
     password: admin
     driver-class-name: org.postgresql.Driver
