@@ -1,10 +1,10 @@
 services:
-  hapi-fhir-jpaserver-start:
+  fhir-backend-jpaserver-start:
     build: .
-    container_name: hapi-fhir-jpaserver-start
+    container_name: fhir-backend-jpaserver-start
     restart: on-failure
     environment:
-      SPRING_DATASOURCE_URL: "jdbc:postgresql://hapi-fhir-postgres:5432/hapi"
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://fhir-backend-postgres:5432/hapi"
       SPRING_DATASOURCE_USERNAME: "admin"
       SPRING_DATASOURCE_PASSWORD: "admin"
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: "org.postgresql.Driver"
@@ -12,7 +12,7 @@ services:
     ports:
       - "8080:8080"
     # Uncomment to enable periodic health checks.
-    # Can also be run manually: docker exec hapi-fhir-jpaserver-start java -cp /app HealthCheck
+    # Can also be run manually: docker exec fhir-backend-jpaserver-start java -cp /app HealthCheck
     # healthcheck:
     #   test: ["CMD", "java", "-cp", "/app", "HealthCheck"]
     #   interval: 30s
@@ -20,11 +20,11 @@ services:
     #   start_period: 60s
     #   retries: 3
     depends_on:
-      hapi-fhir-postgres:
+      fhir-backend-postgres:
         condition: service_healthy
-  hapi-fhir-postgres:
+  fhir-backend-postgres:
     image: postgres:16-alpine
-    container_name: hapi-fhir-postgres
+    container_name: fhir-backend-postgres
     restart: always
     ports:
       - "55432:5432"
