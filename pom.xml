@@ -45,6 +45,14 @@
 
     <name>HAPI FHIR JPA Server - Starter Project</name>
 
+	<distributionManagement>
+		<repository>
+			<id>github</id>
+			<name>GitHub Packages</name>
+			<url>https://maven.pkg.github.com/OHSU-OCTRI/fhir-sandbox-backend</url>
+		</repository>
+	</distributionManagement>
+
     <repositories>
         <repository>
             <name>Central Portal Snapshots</name>
