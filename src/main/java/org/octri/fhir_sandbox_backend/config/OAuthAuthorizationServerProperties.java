@@ -8,25 +8,35 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "octri.sandbox.oauth2")
 public class OAuthAuthorizationServerProperties {
 
+	private String issuerAddress;
 	private String authorizeAddress;
 	private String tokenAddress;
 	private String registerAddress;
 	private String jwkSetAddress;
+	private Boolean enableTokenAuth;
+
+	public String getIssuerAddress() {
+		return issuerAddress;
+	}
+
+	public void setIssuerAddress(String issuerAddress) {
+		this.issuerAddress = issuerAddress;
+	}
 
 	public String getAuthorizeAddress() {
-			return authorizeAddress;
+		return authorizeAddress;
 	}
 
 	public void setAuthorizeAddress(String authorizeAddress) {
-			this.authorizeAddress = authorizeAddress;
+		this.authorizeAddress = authorizeAddress;
 	}
 
 	public String getTokenAddress() {
-			return tokenAddress;
+		return tokenAddress;
 	}
 
 	public void setTokenAddress(String tokenAddress) {
-			this.tokenAddress = tokenAddress;
+		this.tokenAddress = tokenAddress;
 	}
 
 	public String getRegisterAddress() {
@@ -45,10 +55,19 @@ public class OAuthAuthorizationServerProperties {
 		this.jwkSetAddress = jwkSetAddress;
 	}
 
+	public Boolean getEnableTokenAuth() {
+		return enableTokenAuth;
+	}
+
+	public void setEnableTokenAuth(Boolean enableTokenAuth) {
+		this.enableTokenAuth = enableTokenAuth;
+	}
+
 	@Override
 	public String toString() {
-		return "OAuthAuthorizationServerProperties [authorizeAddress=" + authorizeAddress + ", tokenAddress="
-				+ tokenAddress + ", registerAddress=" + registerAddress + ", jwkSetAddress=" + jwkSetAddress + "]";
+		return "OAuthAuthorizationServerProperties [issuerAddress=" + issuerAddress + ", authorizeAddress="
+				+ authorizeAddress + ", tokenAddress=" + tokenAddress + ", registerAddress=" + registerAddress
+				+ ", jwkSetAddress=" + jwkSetAddress + ", enableTokenAuth=" + enableTokenAuth + "]";
 	}
 
 }
