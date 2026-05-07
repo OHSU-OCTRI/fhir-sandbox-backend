@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
+import org.springframework.util.Assert;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.proc.BadJOSEException;
@@ -18,6 +19,7 @@ import ca.uhn.fhir.i18n.Msg;
 import ca.uhn.fhir.interceptor.api.Interceptor;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
+import ca.uhn.fhir.rest.server.exceptions.ForbiddenOperationException;
 import ca.uhn.fhir.rest.server.interceptor.auth.AuthorizationInterceptor;
 import ca.uhn.fhir.rest.server.interceptor.auth.IAuthRule;
 import ca.uhn.fhir.rest.server.interceptor.auth.RuleBuilder;
@@ -28,9 +30,12 @@ import ca.uhn.fhir.rest.server.interceptor.auth.RuleBuilder;
 @Interceptor
 public class JwtAuthorizationInterceptor extends AuthorizationInterceptor {
 
-	// Magic number from the documentation
-	private static final int AUTH_ERROR_CODE = 644;
-	private static final String AUTH_ERROR_MSG = "Missing or invalid authorization header";
+	private static final int AUTHN_ERROR_CODE = 9991;
+	private static final String AUTHN_ERROR_MSG = "Missing or invalid Authorization header";
+	private static final int INVALID_TOKEN_CODE = 9992;
+	private static final String INVALID_TOKEN_MSG = "Invalid or expired Bearer token";
+	private static final int AUDIENCE_ERROR_CODE = 9993;
+	private static final String AUDIENCE_ERROR_MSG = "Sandbox access not allowed by Bearer token";
 
 	private static final String AUTH_HEADER_PREFIX = "Bearer ";
 
@@ -45,42 +50,53 @@ public class JwtAuthorizationInterceptor extends AuthorizationInterceptor {
 	public List<IAuthRule> buildRuleList(RequestDetails requestDetails) {
 		log.info("Authorization interceptor called");
 		var authHeader = requestDetails.getHeader(HttpHeaders.AUTHORIZATION);
-		var token = getTokenValue(authHeader);
-		if (token == null) {
-			throw new AuthenticationException(Msg.code(AUTH_ERROR_CODE) + AUTH_ERROR_MSG);
-		}
-
-		var claims = getTokenClaims(token);
-		log.debug("Token claims: {}", claims);
-		if (claims == null) {
-			throw new AuthenticationException(Msg.code(AUTH_ERROR_CODE) + AUTH_ERROR_MSG);
-		}
+		var token = getTokenValueOrThrow(authHeader);
+		var claims = getTokenClaimsOrThrow(token);
+		verifyTokenAudienceOrThrow(requestDetails.getCompleteUrl(), claims.getAudience());
 
 		return new RuleBuilder().allowAll().build();
 	}
 
-	private String getTokenValue(String headerValue) {
+	private String getTokenValueOrThrow(String headerValue) {
 		log.debug("Auth header value: {}", headerValue);
 		if (StringUtils.isBlank(headerValue) || !headerValue.startsWith(AUTH_HEADER_PREFIX)) {
-			return null;
+			throw new AuthenticationException(Msg.code(AUTHN_ERROR_CODE) + AUTHN_ERROR_MSG);
 		}
 
 		var token = headerValue.substring(AUTH_HEADER_PREFIX.length());
 		log.debug("Extracted token: {}", token);
-		return StringUtils.isBlank(token) ? null : token;
+		if (StringUtils.isBlank(token)) {
+			throw new AuthenticationException(Msg.code(AUTHN_ERROR_CODE) + AUTHN_ERROR_MSG);
+		}
+
+		return token;
 	}
 
-	private JWTClaimsSet getTokenClaims(String token) {
+	private JWTClaimsSet getTokenClaimsOrThrow(String token) {
 		log.debug("Token value: {}", token);
 
 		JWTClaimsSet claimsSet;
 		try {
 			claimsSet = jwtProcessor.process(token, null);
 		} catch (BadJOSEException | JOSEException | ParseException e) {
-			log.error("Error processing JWT token: {}", e.getMessage(), e);
-			return null;
+			log.warn("Error processing JWT token: {}", e.getMessage(), e);
+			throw new AuthenticationException(Msg.code(INVALID_TOKEN_CODE) + INVALID_TOKEN_MSG, e);
 		}
 
+		log.debug("Token claims: {}", claimsSet);
 		return claimsSet;
 	}
+
+	private void verifyTokenAudienceOrThrow(String requestUrl, List<String> tokenAudience) {
+		Assert.isTrue(StringUtils.isNotEmpty(requestUrl), "Request URL is required");
+		Assert.notNull(tokenAudience, "Token audience may not be null");
+		log.debug("Request URL: {}", requestUrl);
+		log.debug("Token audience: {}", tokenAudience);
+
+		var hasMatch = tokenAudience.stream().anyMatch(audience -> requestUrl.indexOf(audience) == 0);
+		if (!hasMatch) {
+			throw new ForbiddenOperationException(Msg.code(AUDIENCE_ERROR_CODE) + AUDIENCE_ERROR_MSG);
+		}
+	}
+
 }
