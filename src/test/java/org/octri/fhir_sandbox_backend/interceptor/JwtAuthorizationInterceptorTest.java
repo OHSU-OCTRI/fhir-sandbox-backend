@@ -23,13 +23,15 @@ import com.nimbusds.jwt.proc.JWTProcessor;
 
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
+import ca.uhn.fhir.rest.server.exceptions.ForbiddenOperationException;
 import ca.uhn.fhir.rest.server.interceptor.auth.IAuthRule;
 
 @ExtendWith(MockitoExtension.class)
 class JwtAuthorizationInterceptorTest {
 
 	private static final String VALID_TOKEN = "valid.jwt.token";
-	private static final String BEARER_VALID = "Bearer " + VALID_TOKEN;
+	private static final String VALID_HEADER = "Bearer " + VALID_TOKEN;
+	private static final String EXAMPLE_AUDIENCE = "http://localhost:8001/fhir/3d2055de-ffd0-4a95-a587-1b54e3d19946/";
 
 	@Mock
 	private JWTProcessor<SecurityContext> jwtProcessor;
@@ -51,8 +53,11 @@ class JwtAuthorizationInterceptorTest {
 				.issueTime(new Date())
 				.expirationTime(new Date(System.currentTimeMillis() + 3600000))
 				.jwtID("test-jwt-id")
+				.audience(EXAMPLE_AUDIENCE)
 				.build();
-		when(requestDetails.getHeader(HttpHeaders.AUTHORIZATION)).thenReturn(BEARER_VALID);
+		when(requestDetails.getHeader(HttpHeaders.AUTHORIZATION)).thenReturn(VALID_HEADER);
+		when(requestDetails.getCompleteUrl())
+				.thenReturn(EXAMPLE_AUDIENCE + "Patient/eFTHaVbQzCEwOEE97maN2MC2jJi-r8nnkhRh.umMUlz03");
 		when(jwtProcessor.process(VALID_TOKEN, null)).thenReturn(claims);
 
 		List<IAuthRule> rules = interceptor.buildRuleList(requestDetails);
@@ -95,7 +100,7 @@ class JwtAuthorizationInterceptorTest {
 	@Test
 	void invalidTokenBadJoseExceptionThrowsAuthenticationException()
 			throws BadJOSEException, JOSEException, ParseException {
-		when(requestDetails.getHeader(HttpHeaders.AUTHORIZATION)).thenReturn(BEARER_VALID);
+		when(requestDetails.getHeader(HttpHeaders.AUTHORIZATION)).thenReturn(VALID_HEADER);
 		when(jwtProcessor.process(VALID_TOKEN, null)).thenThrow(new BadJOSEException("bad jose"));
 
 		assertThrows(AuthenticationException.class, () -> interceptor.buildRuleList(requestDetails),
@@ -105,7 +110,7 @@ class JwtAuthorizationInterceptorTest {
 	@Test
 	void invalidTokenJoseExceptionThrowsAuthenticationException()
 			throws BadJOSEException, JOSEException, ParseException {
-		when(requestDetails.getHeader(HttpHeaders.AUTHORIZATION)).thenReturn(BEARER_VALID);
+		when(requestDetails.getHeader(HttpHeaders.AUTHORIZATION)).thenReturn(VALID_HEADER);
 		when(jwtProcessor.process(VALID_TOKEN, null)).thenThrow(new JOSEException("jose error"));
 
 		assertThrows(AuthenticationException.class, () -> interceptor.buildRuleList(requestDetails),
@@ -115,11 +120,29 @@ class JwtAuthorizationInterceptorTest {
 	@Test
 	void invalidTokenParseExceptionThrowsAuthenticationException()
 			throws BadJOSEException, JOSEException, ParseException {
-		when(requestDetails.getHeader(HttpHeaders.AUTHORIZATION)).thenReturn(BEARER_VALID);
+		when(requestDetails.getHeader(HttpHeaders.AUTHORIZATION)).thenReturn(VALID_HEADER);
 		when(jwtProcessor.process(VALID_TOKEN, null)).thenThrow(new ParseException("parse error", 0));
 
 		assertThrows(AuthenticationException.class, () -> interceptor.buildRuleList(requestDetails),
 				"Throws AuthenticationException for invalid tokens (ParseException)");
+	}
+
+	@Test
+	void audienceMismatchThrowsForbiddenOperationException() throws ParseException, BadJOSEException, JOSEException {
+		var wrongAudienceUrl = "http://localhost:8001/fhir/89ce5978-acc8-46c8-8e12-52694a25b0d3/Patient/abcd1234";
+		var claims = new JWTClaimsSet.Builder()
+				.subject("test-user")
+				.issueTime(new Date())
+				.expirationTime(new Date(System.currentTimeMillis() + 3600000))
+				.jwtID("test-jwt-id")
+				.audience(EXAMPLE_AUDIENCE)
+				.build();
+		when(requestDetails.getHeader(HttpHeaders.AUTHORIZATION)).thenReturn(VALID_HEADER);
+		when(requestDetails.getCompleteUrl()).thenReturn(wrongAudienceUrl);
+		when(jwtProcessor.process(VALID_TOKEN, null)).thenReturn(claims);
+
+		assertThrows(ForbiddenOperationException.class, () -> interceptor.buildRuleList(requestDetails),
+				"Throws ForbiddenOperationException when token audience does not match the sandbox");
 	}
 
 }
