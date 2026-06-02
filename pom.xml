@@ -22,7 +22,7 @@
         <spring_boot_version>3.5.13</spring_boot_version>
         <postgresql.version>42.7.9</postgresql.version>
         <logback_version>1.5.25</logback_version>
-        <jose.version>10.9</jose.version>
+        <jose.version>10.9.1</jose.version>
     </properties>
 
     <!-- one-liner to take you to the cloud with settings form the application.yaml file: -->
