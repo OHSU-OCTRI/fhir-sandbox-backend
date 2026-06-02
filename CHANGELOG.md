@@ -1,5 +1,11 @@
 # Changelog
 
+## [UNRELEASED]
+
+### Dependencies
+
+- Bump `micrometer.version` from 1.16.2 to 1.16.5 ([#12](https://github.com/OHSU-OCTRI/fhir-sandbox-backend/pull/12))
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
