@@ -1,0 +1,24 @@
+name: Create release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to release
+        type: string
+        required: true
+      development_version:
+        description: Next version to set in pom.xml after release. Suffix "-SNAPSHOT" is added automatically.
+        type: string
+        required: true
+
+jobs:
+  prepare-release:
+    name: Prepare release
+    uses: OHSU-OCTRI/shared-workflows/.github/workflows/java-release.yaml@main
+    with:
+      version: ${{ inputs.version }}
+      development_version: ${{ inputs.development_version }}
+      java_version: '17'
+      update_manifests: true
+    secrets: inherit

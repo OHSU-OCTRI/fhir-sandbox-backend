@@ -1,0 +1,35 @@
+---
+name: Build and test
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    types:
+      - opened
+      - edited
+  workflow_dispatch:
+
+jobs:
+  build-java-source:
+    name: Build jar and test
+    uses: OHSU-OCTRI/shared-workflows/.github/workflows/java-build.yaml@main
+    with:
+      java_version: '17'
+      publish_to_github_packages: ${{ github.ref == 'refs/heads/main' || github.ref_type == 'tag' }}
+    secrets: inherit
+
+  run-node-tests:
+    name: Run Node.js tests
+    uses: OHSU-OCTRI/shared-workflows/.github/workflows/node-test.yaml@main
+    with:
+      node_version: '24.x'
+      run_type_checks: true
+    secrets: inherit
+
+  build-container-image:
+    name: Build container image
+    needs: build-java-source
+    if: github.ref == 'refs/heads/main' || github.ref_type == 'tag'
+    uses: OHSU-OCTRI/shared-workflows/.github/workflows/container-image-build.yaml@main
+    secrets: inherit

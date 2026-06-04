@@ -44,15 +44,15 @@
     <version>0.1.0</version>
     <packaging>war</packaging>
 
-    <name>HAPI FHIR JPA Server - Starter Project</name>
+    <name>OCTRI FHIR Sandbox Backend - HAPI FHIR JPA Server</name>
 
-	<distributionManagement>
-		<repository>
-			<id>github</id>
-			<name>GitHub Packages</name>
-			<url>https://maven.pkg.github.com/OHSU-OCTRI/fhir-sandbox-backend</url>
-		</repository>
-	</distributionManagement>
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/OHSU-OCTRI/fhir-sandbox-backend</url>
+        </repository>
+    </distributionManagement>
 
     <repositories>
         <repository>
@@ -762,6 +762,34 @@
                     <version>1.28.0</version>
                 </dependency>
             </dependencies>
+        </profile>
+
+        <profile>
+            <id>ci</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>3.2.8</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <gpgArguments>
+                                <arg>--pinentry-mode</arg>
+                                <arg>loopback</arg>
+                            </gpgArguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 </project>

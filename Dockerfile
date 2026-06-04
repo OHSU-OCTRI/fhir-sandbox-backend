@@ -18,25 +18,6 @@ RUN mkdir /app && cp /tmp/fhir-backend-jpaserver-starter/target/ROOT.war /app/ma
 COPY src/main/java/HealthCheck.java /app/HealthCheck.java
 RUN javac /app/HealthCheck.java
 
-
-########### Use the official Tomcat image as base image for the Tomcat variant
-########### it can be built using eg. `docker build --target tomcat .`
-FROM docker.io/library/tomcat:10-jre21-temurin-noble AS tomcat
-
-USER root
-RUN rm -rf /usr/local/tomcat/webapps/ROOT && \
-    mkdir -p /usr/local/tomcat/data/hapi/lucenefiles && \
-    chown -R 65532:65532 /usr/local/tomcat/data/hapi/lucenefiles && \
-    chmod 775 /usr/local/tomcat/data/hapi/lucenefiles
-
-RUN mkdir -p /target && chown -R 65532:65532 /target
-USER 65532
-
-COPY --chown=65532:65532 catalina.properties /usr/local/tomcat/conf/catalina.properties
-COPY --chown=65532:65532 server.xml /usr/local/tomcat/conf/server.xml
-COPY --from=build-hapi --chown=65532:65532 /tmp/fhir-backend-jpaserver-starter/target/ROOT.war /usr/local/tomcat/webapps/ROOT.war
-COPY --from=build-hapi --chown=65532:65532 /tmp/fhir-backend-jpaserver-starter/opentelemetry-javaagent.jar /app
-
 ########### distroless brings focus on security and runs on plain spring boot - this is the default image
 FROM gcr.io/distroless/java21-debian13:nonroot AS default
 # 65532 is the nonroot user's uid
