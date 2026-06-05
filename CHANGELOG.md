@@ -32,10 +32,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remap PostgreSQL port to avoid conflict with existing applications (RFS-253)
 - Remap other ports and container names to avoid conflicts with existing applications (RFS-253)
 - Update PostgreSQL driver to resolve vulnerability (RFS-256)
+- Use OCTRI build and release workflows (RFS-256)
 
 ### Removed
 
 - Deleted most GitHub Actions workflows (RFS-253)
+- Deleted Maven build workflow (RFS-256)
+- Delete build step for Tomcat image variant (RFS-256)
 
 
 [unreleased]: https://github.com/OCTRI-Apps/fhir-sandbox-backend/compare/v0.1.0...HEAD
