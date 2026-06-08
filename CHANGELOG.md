@@ -33,6 +33,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remap other ports and container names to avoid conflicts with existing applications (RFS-253)
 - Update PostgreSQL driver to resolve vulnerability (RFS-256)
 - Use OCTRI build and release workflows (RFS-256)
+- Use OCTRI's usual image build pattern instead of multi-stage build (RFS-256)
+- Add Kubernetes deployment manifests (RFS-256)
 
 ### Removed
 

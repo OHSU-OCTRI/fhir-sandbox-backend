@@ -24,4 +24,7 @@ jobs:
     needs: build-java-source
     if: github.ref == 'refs/heads/main' || github.ref_type == 'tag'
     uses: OHSU-OCTRI/shared-workflows/.github/workflows/container-image-build.yaml@main
+    with:
+      artifact_name: ${{ github.sha }}-jar
+      artifact_path: target
     secrets: inherit
