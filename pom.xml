@@ -41,7 +41,7 @@
 
     <groupId>org.octri</groupId>
     <artifactId>fhir-sandbox-backend</artifactId>
-    <version>0.1.0</version>
+    <version>0.1.0-SNAPSHOT</version>
     <packaging>war</packaging>
 
     <name>OCTRI FHIR Sandbox Backend - HAPI FHIR JPA Server</name>
