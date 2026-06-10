@@ -3,7 +3,8 @@
 ## [UNRELEASED]
 
 ### Dependencies
-
+- Bump `micrometer.version` from 1.16.2 to 1.16.5 ([#12](https://github.com/OHSU-OCTRI/fhir-sandbox-backend/pull/12))
+- Bump `org.apache.maven.plugins:maven-failsafe-plugin` from 3.5.4 to 3.5.6 ([#15](https://github.com/OHSU-OCTRI/fhir-sandbox-backend/pull/15))
 - Bump `micrometer.version` from 1.16.2 to 1.16.5 ([#12](https://github.com/OHSU-OCTRI/fhir-sandbox-backend/pull/12))
 
 All notable changes to this project will be documented in this file.
