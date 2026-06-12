@@ -44,8 +44,8 @@ spec:
             memory: 512Mi
             cpu: 50m
           limits:
-            memory: 1024Mi
-            cpu: 500m
+            memory: 2Gi
+            cpu: 1000m
         ports:
         - containerPort: 8080
         envFrom:
@@ -53,5 +53,16 @@ spec:
             name: fhir-sandbox-backend-dev
         - secretRef:
             name: fhir-sandbox-backend-dev
+        volumeMounts:
+        - name: config-files
+          mountPath: /config
+          readOnly: true
+      volumes:
+      - name: config-files
+        configMap:
+          name: fhir-sandbox-backend-dev
+          items:
+          - key: application.properties
+            path: application.properties
       imagePullSecrets:
       - name: ghcr-registry-cred

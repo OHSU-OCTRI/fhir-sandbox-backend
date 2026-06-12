@@ -49,6 +49,11 @@ public class JwtAuthorizationInterceptor extends AuthorizationInterceptor {
 	@Override
 	public List<IAuthRule> buildRuleList(RequestDetails requestDetails) {
 		log.info("Authorization interceptor called");
+
+		if ("metadata".equals(requestDetails.getOperation())) {
+			return new RuleBuilder().allow("allow metadata rule").metadata().build();
+		}
+
 		var authHeader = requestDetails.getHeader(HttpHeaders.AUTHORIZATION);
 		var token = getTokenValueOrThrow(authHeader);
 		var claims = getTokenClaimsOrThrow(token);

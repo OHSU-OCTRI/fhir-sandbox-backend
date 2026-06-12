@@ -36,6 +36,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Use OCTRI's usual image build pattern instead of multi-stage build (RFS-256)
 - Add Kubernetes deployment manifests (RFS-256)
 - Update package version in pom.xml to prevent package conflict (RFS-256)
+- Suppress logging from `BaseInterceptorService` to prevent alerts for authn/authz failures (RFS-299)
+
+### Fixed
+
+- Allow metadata requests without an `Authorization` header (RFS-299)
 
 ### Removed
 
