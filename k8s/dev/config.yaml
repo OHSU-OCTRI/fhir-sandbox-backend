@@ -17,3 +17,6 @@ data:
   OCTRI_SANDBOX_OAUTH2_ISSUER_ADDRESS: https://octridev.ohsu.edu/fhir-sandbox
   OCTRI_SANDBOX_OAUTH2_JWK_SET_ADDRESS: https://octridev.ohsu.edu/fhir-sandbox/oauth2/jwks
   OCTRI_SANDBOX_OAUTH2_TOKEN_ADDRESS: https://octridev.ohsu.edu/fhir-sandbox/oauth2/token
+  # TODO: move this to a separate ConfigMap if other config files are needed
+  application.properties: |
+    logging.level.ca.uhn.fhir.interceptor.executor.BaseInterceptorService=off
