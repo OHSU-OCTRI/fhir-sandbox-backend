@@ -3,7 +3,8 @@
 ## [UNRELEASED]
 
 ### Dependencies
-
+- Bump `micrometer.version` from 1.16.2 to 1.16.5 ([#12](https://github.com/OHSU-OCTRI/fhir-sandbox-backend/pull/12))
+- Bump `spring_boot_version` from 3.5.13 to 4.1.0 ([#22](https://github.com/OHSU-OCTRI/fhir-sandbox-backend/pull/22))
 - Bump `micrometer.version` from 1.16.2 to 1.16.5 ([#12](https://github.com/OHSU-OCTRI/fhir-sandbox-backend/pull/12))
 
 All notable changes to this project will be documented in this file.
