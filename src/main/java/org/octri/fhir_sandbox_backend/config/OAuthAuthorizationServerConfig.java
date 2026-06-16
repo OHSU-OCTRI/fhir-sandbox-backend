@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.jwk.source.JWKSourceBuilder;
@@ -39,7 +40,8 @@ public class OAuthAuthorizationServerConfig {
 
 	private final OAuthAuthorizationServerProperties properties;
 
-	public OAuthAuthorizationServerConfig(OAuthAuthorizationServerProperties properties, RestfulServer restfulServer) {
+	public OAuthAuthorizationServerConfig(OAuthAuthorizationServerProperties properties, RestfulServer restfulServer,
+			ObjectMapper objectMapper) {
 		log.info("Initializing OAuthAuthorizationServerConfig with properties: {}", properties);
 		this.properties = properties;
 		restfulServer.registerInterceptor(this.capabilityStatementCustomizer());
@@ -48,7 +50,7 @@ public class OAuthAuthorizationServerConfig {
 		if (Boolean.TRUE.equals(properties.getEnableTokenAuth())) {
 			log.info("Enabling token authentication");
 			try {
-				restfulServer.registerInterceptor(this.jwtAuthorizationInterceptor());
+				restfulServer.registerInterceptor(this.jwtAuthorizationInterceptor(objectMapper));
 			} catch (MalformedURLException e) {
 				log.error("JWK source URL is malformed: {}", e.getMessage(), e);
 				throw new IllegalArgumentException(
@@ -71,9 +73,10 @@ public class OAuthAuthorizationServerConfig {
 		return new SmartWellKnownInterceptor(this.properties);
 	}
 
-	private JwtAuthorizationInterceptor jwtAuthorizationInterceptor() throws MalformedURLException {
+	private JwtAuthorizationInterceptor jwtAuthorizationInterceptor(ObjectMapper objectMapper)
+			throws MalformedURLException {
 		log.debug("Creating JwtAuthorizationInterceptor");
-		return new JwtAuthorizationInterceptor(jwtProcessor());
+		return new JwtAuthorizationInterceptor(jwtProcessor(), objectMapper);
 	}
 
 	private JWKSource<SecurityContext> jwkSource() throws MalformedURLException {
