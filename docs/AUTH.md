@@ -7,7 +7,7 @@ Every inbound FHIR request passes through `JwtAuthorizationInterceptor`, which v
 1. token extraction
 1. token validation
 1. audience check
-1. scope-to-rule translation.
+1. scope-to-rule translation
 
 The `/metadata` (capability statement) endpoint is always allowed without a token.
 
@@ -58,6 +58,8 @@ For `patient/`-context scopes, the token must also contain a `launchContext` cla
 | `encounter` | Encounter ID (available but not currently used for compartment rules) |
 | `fhirUser` | FHIR ID of the authenticated user |
 | `clientId` | Registered OAuth client ID |
+
+Note that patient and encounter IDs should be a bare ID string, not a FHIR reference such as `Patient/abcd123`. On the other hand, the `fhirUser` ID should be a reference, because it could represent a `Patient`, `Practitioner`, `PractitionerRole`, `RelatedPerson`, or `Person`.
 
 A missing or invalid `launchContext` claim returns status code 401 with error code `9995`. A `patient/` scope with a `launchContext` that has no `patient` field returns status code 401 with error code `9996`.
 
