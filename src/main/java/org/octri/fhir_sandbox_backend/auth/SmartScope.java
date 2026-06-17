@@ -142,6 +142,24 @@ public class SmartScope {
 		return hasPermission("s");
 	}
 
+	/**
+	 * Reports whether this scope grants all permissions (cruds).
+	 *
+	 * @return true if all operations are permitted, false otherwise
+	 */
+	public boolean allowsAllPermissions() {
+		return "cruds".equals(permissions);
+	}
+
+	/**
+	 * Reports whether the scope is a wildcard resource type (allows all resources).
+	 *
+	 * @return true if all resource types are permitted, false otherwise
+	 */
+	public boolean allowsAllResources() {
+		return "*".equals(resourceType);
+	}
+
 	@Override
 	public String toString() {
 		return rawScope;

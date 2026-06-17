@@ -2,11 +2,12 @@
 
 ## Overview
 
-Every inbound FHIR request passes through `JwtAuthorizationInterceptor`, which validates a JWT bearer token and converts SMART on FHIR scopes into HAPI FHIR authorization rules. The pipeline has four stages:
+Every inbound FHIR request passes through `JwtAuthorizationInterceptor`, which validates a JWT bearer token and converts SMART on FHIR scopes into HAPI FHIR authorization rules. The pipeline has five stages:
 
 1. token extraction
 1. token validation
 1. audience check
+1. Privileged request handling
 1. scope-to-rule translation
 
 The `/metadata` (capability statement) endpoint is always allowed without a token.
@@ -23,7 +24,11 @@ The token is processed by a `JWTProcessor` (configured elsewhere). If the token 
 
 The token's `aud` claim is compared against the incoming request URL. Every audience value must be a valid FHIR partition root URL of the form `{scheme}://{host}/fhir/{partition}/`, where `{partition}` is either DEFAULT or a UUID. If an audience does not match the expected pattern, the request is rejected with status code 401 and error code `9997`.
 
-## Stage 4 — Scope Processing
+## Stage 4 - Privileged Request Handling
+
+To handle privileged requests such as partition management, if the request is for the DEFAULT partition, there are no patient or user scopes, and a `system/*.cruds` scope is present, then an allow all rule returned.
+
+## Stage 5 — Scope Processing
 
 ### Scope Parsing
 

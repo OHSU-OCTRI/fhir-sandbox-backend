@@ -188,7 +188,7 @@ class JwtAuthorizationInterceptorTest {
 	}
 
 	@Test
-	void emptyAudienceListDoesNotMatchUrl() throws ParseException, BadJOSEException, JOSEException {
+	void emptyAudienceListThrowsAuthenticationException() throws ParseException, BadJOSEException, JOSEException {
 		List<String> audiences = List.of();
 		var claims = getDefaultClaims()
 				.audience(audiences)
@@ -293,6 +293,23 @@ class JwtAuthorizationInterceptorTest {
 
 		var rules = interceptor.buildRuleList(requestDetails);
 		assertThat(rules).isNotEmpty();
+	}
+
+	@Test
+	void requestToDefaultPartitionWithSystemWildcardScopeAllowsAll()
+			throws ParseException, BadJOSEException, JOSEException {
+		var defaultPartitionUrl = "http://localhost:8001/fhir/DEFAULT/";
+		var partitionCreateRequest = defaultPartitionUrl + "$partition-management-create-partition";
+		var claims = getDefaultClaims()
+				.audience(defaultPartitionUrl)
+				.claim("scope", makeScopeClaim("system/*.*"))
+				.build();
+		mockRequestWithClaims(partitionCreateRequest, claims);
+		when(requestDetails.getTenantId()).thenReturn("DEFAULT");
+
+		var rules = interceptor.buildRuleList(requestDetails);
+		assertEquals(1, rules.size(), "privileged request rule");
+		assertEquals("privileged request rule", rules.get(0).getName(), "The rule should have the expected name");
 	}
 
 	@Test

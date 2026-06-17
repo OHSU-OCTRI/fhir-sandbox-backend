@@ -150,6 +150,7 @@ class SmartScopeTest {
 			assertFalse(scope.allowsUpdate());
 			assertFalse(scope.allowsDelete());
 			assertFalse(scope.allowsSearch());
+			assertFalse(scope.allowsAllPermissions());
 		}
 
 		@ParameterizedTest(name = "cruds allows all permissions")
@@ -161,6 +162,25 @@ class SmartScopeTest {
 			assertTrue(scope.allowsUpdate());
 			assertTrue(scope.allowsDelete());
 			assertTrue(scope.allowsSearch());
+			assertTrue(scope.allowsAllPermissions());
+		}
+	}
+
+	@Nested
+	@DisplayName("allowsAllResources")
+	class AllowsAllResourcesMethod {
+
+		@Test
+		void wildcardResourceTypeAllowsAllResources() {
+			var scope = resourceScope(SmartScopeContext.PATIENT, "*", "cruds");
+			assertTrue(scope.allowsAllResources(), "* should allow all resources");
+		}
+
+		@ParameterizedTest(name = "other resource types do not allow all resources")
+		@ValueSource(strings = { "Patient", "Observation", "AllergyIntolerance" })
+		void otherResourceTypesDoNotAllowAllResources(String resourceType) {
+			var scope = resourceScope(SmartScopeContext.PATIENT, resourceType, "rs");
+			assertFalse(scope.allowsAllPermissions(), resourceType + " should not allow all resources");
 		}
 	}
 

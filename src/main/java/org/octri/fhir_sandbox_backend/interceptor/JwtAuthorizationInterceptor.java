@@ -72,26 +72,46 @@ public class JwtAuthorizationInterceptor extends AuthorizationInterceptor {
 
 	@Override
 	public List<IAuthRule> buildRuleList(RequestDetails requestDetails) {
-		log.info("Authorization interceptor called");
+		log.debug("Authorization interceptor called");
 
-		if ("metadata".equals(requestDetails.getOperation())) {
+		// Always allow capability statement requests
+		if (isMetadataRequest(requestDetails)) {
 			return new RuleBuilder().allow("allow metadata rule").metadata().build();
 		}
 
+		// Basic token validity checks: Presence, format, signature
 		var authHeader = requestDetails.getHeader(HttpHeaders.AUTHORIZATION);
 		var token = getTokenValueOrThrow(authHeader);
 		var claims = getTokenClaimsOrThrow(token);
+
+		// Verify that the token audience matches the URL
 		verifyTokenAudienceOrThrow(requestDetails.getCompleteUrl(), claims.getAudience());
 
+		// Extract, parse, and validate the token's scopes
 		var groupedScopes = extractScopes(claims);
 		log.debug("Extracted scopes: {}", groupedScopes);
 
-		var launchContext = getLaunchContext(claims);
-		log.debug("Launch context: {}", launchContext);
+		// Allow all operations if the partition is DEFAULT and scope is system/*.cruds
+		if (isPrivilegedRequest(requestDetails, groupedScopes)) {
+			return new RuleBuilder().allowAll("privileged request rule").build();
+		}
 
-		var scopeRules = buildScopeRules(groupedScopes, launchContext);
-
+		// Convert token scopes to auth rules
+		var scopeRules = buildScopeRules(groupedScopes, claims);
 		return !scopeRules.isEmpty() ? scopeRules : new RuleBuilder().denyAll("deny all rule").build();
+	}
+
+	private boolean isMetadataRequest(RequestDetails requestDetails) {
+		return "metadata".equals(requestDetails.getOperation());
+	}
+
+	private boolean isPrivilegedRequest(RequestDetails requestDetails, GroupedScopes groupedScopes) {
+		var isDefaultPartition = "DEFAULT".equals(requestDetails.getTenantId());
+		var otherScopesEmpty = groupedScopes.patientScopes().isEmpty() && groupedScopes.userScopes().isEmpty();
+		var hasFullSystemScope = groupedScopes.systemScopes().stream()
+				.anyMatch(scope -> scope.allowsAllResources() && scope.allowsAllPermissions());
+
+		return isDefaultPartition && otherScopesEmpty && hasFullSystemScope;
 	}
 
 	private String getTokenValueOrThrow(String headerValue) {
@@ -167,10 +187,11 @@ public class JwtAuthorizationInterceptor extends AuthorizationInterceptor {
 		}
 	}
 
-	private List<IAuthRule> buildScopeRules(GroupedScopes groupedScopes, LaunchContext launchContext) {
+	private List<IAuthRule> buildScopeRules(GroupedScopes groupedScopes, JWTClaimsSet claims) {
 		var ruleList = new ArrayList<IAuthRule>();
 
 		if (!groupedScopes.patientScopes().isEmpty()) {
+			var launchContext = getLaunchContext(claims);
 			if (launchContext == null || launchContext.getPatient() == null) {
 				throw new AuthenticationException(Msg.code(MISSING_PATIENT_ID_CODE) + MISSING_PATIENT_ID_MSG);
 			}
