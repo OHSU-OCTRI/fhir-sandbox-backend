@@ -42,6 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Allow metadata requests without an `Authorization` header (RFS-299)
+- Use FHIR sandbox base URL for audience check instead of full URL with query string (RFS-300)
 
 ### Removed
 

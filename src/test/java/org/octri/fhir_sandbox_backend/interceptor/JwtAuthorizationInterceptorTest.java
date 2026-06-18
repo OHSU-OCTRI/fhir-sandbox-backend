@@ -10,6 +10,7 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,6 +38,8 @@ class JwtAuthorizationInterceptorTest {
 	private static final String EXAMPLE_AUDIENCE = "http://localhost:8001/fhir/3d2055de-ffd0-4a95-a587-1b54e3d19946/";
 	private static final String PATIENT_PATH = "Patient/eFTHaVbQzCEwOEE97maN2MC2jJi-r8nnkhRh.umMUlz03";
 	private static final String DEFAULT_URL = EXAMPLE_AUDIENCE + PATIENT_PATH;
+	private static final Pattern BASE_URL_PATTERN = Pattern.compile(
+			"^(https?://.+/fhir/(DEFAULT|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}))");
 
 	private static final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -134,6 +137,19 @@ class JwtAuthorizationInterceptorTest {
 
 		assertDoesNotThrow(() -> interceptor.buildRuleList(requestDetails),
 				"Audience check should allow access to the sandbox URL without the trailing slash, as in paginated responses");
+	}
+
+	@Test
+	void urlsWithQueryStringMatchingAudienceAreAllowed() throws ParseException, BadJOSEException, JOSEException {
+		var noSlashSandboxUrl = "http://localhost:8001/fhir/3d2055de-ffd0-4a95-a587-1b54e3d19946";
+		var queryString = "?_getpages=ac766649-d62c-4e5b-a9ec-24037b358823&_getpagesoffset=20&_count=20&_pretty=true&_bundletype=searchset";
+		var claims = getDefaultClaims()
+				.claim("scope", makeScopeClaim("system/*.*"))
+				.build();
+		mockRequestWithClaims(noSlashSandboxUrl + queryString, claims);
+
+		assertDoesNotThrow(() -> interceptor.buildRuleList(requestDetails),
+				"Audience check should allow access to the sandbox URL if one of the audiences matches");
 	}
 
 	@Test
@@ -348,9 +364,12 @@ class JwtAuthorizationInterceptorTest {
 
 	private void mockRequestWithClaims(String requestUrl, JWTClaimsSet claims)
 			throws ParseException, BadJOSEException, JOSEException {
+		// Use a regex to extract the URL up to the tenant ID
+		var urlMatcher = BASE_URL_PATTERN.matcher(requestUrl);
+		urlMatcher.find();
+		var fhirBaseUrl = urlMatcher.group(0);
 		when(requestDetails.getHeader(HttpHeaders.AUTHORIZATION)).thenReturn(VALID_HEADER);
-		when(requestDetails.getCompleteUrl())
-				.thenReturn(requestUrl);
+		when(requestDetails.getFhirServerBase()).thenReturn(fhirBaseUrl);
 		when(jwtProcessor.process(MOCK_TOKEN, null)).thenReturn(claims);
 	}
 
