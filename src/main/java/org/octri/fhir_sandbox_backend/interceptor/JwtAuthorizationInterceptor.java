@@ -84,8 +84,8 @@ public class JwtAuthorizationInterceptor extends AuthorizationInterceptor {
 		var token = getTokenValueOrThrow(authHeader);
 		var claims = getTokenClaimsOrThrow(token);
 
-		// Verify that the token audience matches the URL
-		verifyTokenAudienceOrThrow(requestDetails.getCompleteUrl(), claims.getAudience());
+		// Verify that the token audience matches the FHIR server URL
+		verifyTokenAudienceOrThrow(requestDetails.getFhirServerBase(), claims.getAudience());
 
 		// Extract, parse, and validate the token's scopes
 		var groupedScopes = extractScopes(claims);
@@ -144,20 +144,19 @@ public class JwtAuthorizationInterceptor extends AuthorizationInterceptor {
 		return claimsSet;
 	}
 
-	private void verifyTokenAudienceOrThrow(String requestUrl, List<String> tokenAudience) {
-		Assert.isTrue(StringUtils.isNotEmpty(requestUrl), "Request URL is required");
-		Assert.notNull(tokenAudience, "Token audience may not be null");
+	private void verifyTokenAudienceOrThrow(String fhirServerUrl, List<String> audienceList) {
+		Assert.isTrue(StringUtils.isNotEmpty(fhirServerUrl), "Server URL is required");
+		Assert.notNull(audienceList, "Token audience list may not be null");
 
-		for (String audience : tokenAudience) {
+		for (String audience : audienceList) {
 			if (!AUDIENCE_PATTERN.matcher(audience).matches()) {
 				throw new AuthenticationException(
 						Msg.code(INVALID_AUDIENCE_CODE) + INVALID_AUDIENCE_MSG + audience);
 			}
 		}
 
-		var hasMatch = tokenAudience.stream()
-				.anyMatch(audience -> requestUrl.startsWith(audience)
-						|| requestUrl.equals(StringUtils.stripEnd(audience, "/")));
+		var hasMatch = audienceList.stream()
+				.anyMatch(audience -> fhirServerUrl.equals(StringUtils.stripEnd(audience, "/")));
 		if (!hasMatch) {
 			throw new ForbiddenOperationException(Msg.code(AUDIENCE_ERROR_CODE) + AUDIENCE_ERROR_MSG);
 		}
