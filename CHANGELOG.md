@@ -38,6 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add Kubernetes deployment manifests (RFS-256)
 - Update package version in pom.xml to prevent package conflict (RFS-256)
 - Suppress logging from `BaseInterceptorService` to prevent alerts for authn/authz failures (RFS-299)
+- Update Kubernetes manifests for production deployment (RFS-297)
 
 ### Fixed
 
