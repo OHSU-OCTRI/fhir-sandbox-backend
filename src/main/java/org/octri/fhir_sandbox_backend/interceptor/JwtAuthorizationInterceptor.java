@@ -73,10 +73,6 @@ public class JwtAuthorizationInterceptor extends AuthorizationInterceptor {
 	@Override
 	public List<IAuthRule> buildRuleList(RequestDetails requestDetails) {
 		log.debug("Authorization interceptor called");
-		log.debug("URL: {}", requestDetails.getCompleteUrl());
-		log.debug("Compartment: {}", requestDetails.getCompartmentName());
-		log.debug("Resource: {}", requestDetails.getResourceName());
-		log.debug("Operation: {}", requestDetails.getOperation());
 
 		// Always allow capability statement requests
 		if (isMetadataRequest(requestDetails)) {
@@ -102,7 +98,6 @@ public class JwtAuthorizationInterceptor extends AuthorizationInterceptor {
 
 		// Convert token scopes to auth rules
 		var scopeRules = buildScopeRules(groupedScopes, claims);
-		log.debug("scopeRules: {}", scopeRules);
 		return !scopeRules.isEmpty() ? scopeRules : new RuleBuilder().denyAll("deny all rule").build();
 	}
 
