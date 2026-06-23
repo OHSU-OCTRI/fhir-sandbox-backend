@@ -208,6 +208,13 @@ public class JwtAuthorizationInterceptor extends AuthorizationInterceptor {
 			ruleList.addAll(new SmartScopeRuleBuilder(groupedScopes.systemScopes()).build());
 		}
 
+		if (!ruleList.isEmpty()) {
+			// Explicitly allow any bundle or batch transaction allowed by the other scopes
+			var transactionRule = new RuleBuilder().allow("transaction rule").transaction().withAnyOperation()
+					.andApplyNormalRules().build();
+			ruleList.addAll(0, transactionRule);
+		}
+
 		return ruleList;
 	}
 
