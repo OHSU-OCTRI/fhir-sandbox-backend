@@ -43,6 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Allow metadata requests without an `Authorization` header (RFS-299)
 - Use FHIR sandbox base URL for audience check instead of full URL with query string (RFS-300)
+- Add `IAuthRule` that authorizes transactions if any other rules are generated (RFS-304)
 
 ### Removed
 

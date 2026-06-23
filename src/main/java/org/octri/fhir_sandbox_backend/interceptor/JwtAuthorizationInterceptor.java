@@ -73,6 +73,10 @@ public class JwtAuthorizationInterceptor extends AuthorizationInterceptor {
 	@Override
 	public List<IAuthRule> buildRuleList(RequestDetails requestDetails) {
 		log.debug("Authorization interceptor called");
+		log.debug("URL: {}", requestDetails.getCompleteUrl());
+		log.debug("Compartment: {}", requestDetails.getCompartmentName());
+		log.debug("Resource: {}", requestDetails.getResourceName());
+		log.debug("Operation: {}", requestDetails.getOperation());
 
 		// Always allow capability statement requests
 		if (isMetadataRequest(requestDetails)) {
@@ -98,6 +102,7 @@ public class JwtAuthorizationInterceptor extends AuthorizationInterceptor {
 
 		// Convert token scopes to auth rules
 		var scopeRules = buildScopeRules(groupedScopes, claims);
+		log.debug("scopeRules: {}", scopeRules);
 		return !scopeRules.isEmpty() ? scopeRules : new RuleBuilder().denyAll("deny all rule").build();
 	}
 
@@ -206,6 +211,13 @@ public class JwtAuthorizationInterceptor extends AuthorizationInterceptor {
 
 		if (!groupedScopes.systemScopes().isEmpty()) {
 			ruleList.addAll(new SmartScopeRuleBuilder(groupedScopes.systemScopes()).build());
+		}
+
+		if (!ruleList.isEmpty()) {
+			// Explicitly allow any bundle or batch transaction allowed by the other scopes
+			var transactionRule = new RuleBuilder().allow("transaction rule").transaction().withAnyOperation()
+					.andApplyNormalRules().build();
+			ruleList.addAll(0, transactionRule);
 		}
 
 		return ruleList;

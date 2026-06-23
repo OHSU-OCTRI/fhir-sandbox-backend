@@ -3,6 +3,7 @@ package org.octri.fhir_sandbox_backend.interceptor;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
@@ -309,6 +310,10 @@ class JwtAuthorizationInterceptorTest {
 
 		var rules = interceptor.buildRuleList(requestDetails);
 		assertThat(rules).isNotEmpty();
+
+		var transactionRule = rules.stream().filter(rule -> "transaction rule".equals(rule.getName())).findFirst()
+				.orElse(null);
+		assertNotNull(transactionRule, "a rule to allow transactions should be present");
 	}
 
 	@Test
@@ -337,6 +342,10 @@ class JwtAuthorizationInterceptorTest {
 
 		var rules = interceptor.buildRuleList(requestDetails);
 		assertThat(rules).isNotEmpty();
+
+		var transactionRule = rules.stream().filter(rule -> "transaction rule".equals(rule.getName())).findFirst()
+				.orElse(null);
+		assertNotNull(transactionRule, "a rule to allow transactions should be present");
 	}
 
 	@Test
@@ -348,6 +357,10 @@ class JwtAuthorizationInterceptorTest {
 
 		var rules = interceptor.buildRuleList(requestDetails);
 		assertThat(rules).isNotEmpty();
+
+		var transactionRule = rules.stream().filter(rule -> "transaction rule".equals(rule.getName())).findFirst()
+				.orElse(null);
+		assertNotNull(transactionRule, "a rule to allow transactions should be present");
 	}
 
 	@Test
