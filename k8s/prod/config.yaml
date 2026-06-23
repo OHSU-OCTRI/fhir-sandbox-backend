@@ -1,4 +1,4 @@
-# ConfigMap for fhir-sandbox-backend-dev
+# ConfigMap for fhir-sandbox-backend-prod
 #
 # k8s documentation:
 # - https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#create-a-configmap
