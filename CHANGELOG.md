@@ -7,7 +7,8 @@
 - Create a test build workflow to handle PRs (CIS-3773)
 
 ### Dependencies
-
+- Bump `micrometer.version` from 1.16.2 to 1.16.5 ([#12](https://github.com/OHSU-OCTRI/fhir-sandbox-backend/pull/12))
+- Bump `com.zaxxer:HikariCP` from 5.1.0 to 7.1.0 ([#23](https://github.com/OHSU-OCTRI/fhir-sandbox-backend/pull/23))
 - Bump `micrometer.version` from 1.16.2 to 1.16.5 ([#12](https://github.com/OHSU-OCTRI/fhir-sandbox-backend/pull/12))
 
 All notable changes to this project will be documented in this file.
