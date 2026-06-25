@@ -2,6 +2,10 @@
 
 ## [UNRELEASED]
 
+### Changed
+
+- Create a test build workflow to handle PRs (CIS-3773)
+
 ### Dependencies
 
 - Bump `micrometer.version` from 1.16.2 to 1.16.5 ([#12](https://github.com/OHSU-OCTRI/fhir-sandbox-backend/pull/12))
