@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hl7.fhir.instance.model.api.IIdType;
+import org.hl7.fhir.r4.model.Patient;
 import org.springframework.util.Assert;
 
 import ca.uhn.fhir.rest.server.interceptor.auth.IAuthRule;
@@ -84,6 +85,12 @@ public class SmartScopeRuleBuilder {
 		if (scope.allowsRead() || scope.allowsSearch()) {
 			rules.addAll(applyCompartment(scope.getCompartmentName(),
 					resourcesOfType(new RuleBuilder().allow(scope.getRawScope()).read(), scope.getResourceType())));
+
+			// $everything is an extended operation on Patient; authorize it when the scope covers Patient resources
+			// so callers can export a full patient bundle.
+			if (appliesToPatient(scope)) {
+				rules.addAll(buildEverythingOperationRule(scope));
+			}
 		}
 
 		if (scope.allowsCreate()) {
@@ -102,6 +109,43 @@ public class SmartScopeRuleBuilder {
 		}
 
 		return rules;
+	}
+
+	private boolean appliesToPatient(SmartScope scope) {
+		return scope.allowsAllResources() || "Patient".equals(scope.getResourceType());
+	}
+
+	/**
+	 * Builds an operation rule that allows the {@code $everything} extended operation on Patient instances.
+	 *
+	 * <p>For {@code patient/} context scopes the rule is restricted to the configured patient ID so callers
+	 * cannot invoke {@code $everything} on arbitrary patients. The response is checked against the caller's
+	 * existing scope rules, so a wildcard read scope ({@code patient/*.rs}) is needed to receive all resource
+	 * types in the bundle; a narrow scope such as {@code patient/Patient.r} will authorize the operation but
+	 * non-Patient resources will be omitted from the response.
+	 *
+	 * @param scope
+	 *           the scope that triggered this rule (must allow read or search on Patient or {@code *})
+	 * @return list containing the {@code $everything} operation rule
+	 */
+	private List<IAuthRule> buildEverythingOperationRule(SmartScope scope) {
+		if ("patient".equals(scope.getCompartmentName())) {
+			Assert.notNull(patientId, "Patient ID is required for patient-context $everything rule");
+			return new RuleBuilder()
+					.allow(scope.getRawScope())
+					.operation()
+					.named("everything")
+					.onInstance(patientId)
+					.andRequireExplicitResponseAuthorization()
+					.build();
+		}
+		return new RuleBuilder()
+				.allow(scope.getRawScope())
+				.operation()
+				.named("everything")
+				.onInstancesOfType(Patient.class)
+				.andRequireExplicitResponseAuthorization()
+				.build();
 	}
 
 	private IAuthRuleBuilderRuleOpClassifier resourcesOfType(IAuthRuleBuilderRuleOp op, String resourceType) {
