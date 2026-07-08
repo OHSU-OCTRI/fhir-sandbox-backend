@@ -6,7 +6,6 @@
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "mainClass": "ca.uhn.fhir.jpa.starter.Application",
-            "projectName": "hapi-fhir-jpaserver-starter",
             "vmArgs": [
 				"-XX:TieredStopAtLevel=1",
 				// "-Ddebug=true",

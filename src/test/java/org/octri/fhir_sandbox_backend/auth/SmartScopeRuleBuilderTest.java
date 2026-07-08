@@ -133,10 +133,10 @@ class SmartScopeRuleBuilderTest {
 			var obs = resourceScope("user/Observation.r", SmartScopeContext.USER, "Observation", "r");
 			var pat = resourceScope("user/Patient.r", SmartScopeContext.USER, "Patient", "r");
 			var rules = new SmartScopeRuleBuilder(List.of(obs, pat)).build();
-			assertEquals(2, rules.size());
-			var names = rules.stream().map(IAuthRule::getName).toList();
-			assertTrue(names.contains("user/Observation.r"));
-			assertTrue(names.contains("user/Patient.r"));
+			var uniqueNames = rules.stream().map(IAuthRule::getName).distinct().toList();
+			assertEquals(2, uniqueNames.size());
+			assertTrue(uniqueNames.contains("user/Observation.r"));
+			assertTrue(uniqueNames.contains("user/Patient.r"));
 		}
 	}
 
@@ -185,7 +185,8 @@ class SmartScopeRuleBuilderTest {
 		void wildcardResourceTypeProducesRules() {
 			var scope = resourceScope("user/*.r", SmartScopeContext.USER, "*", "r");
 			var rules = new SmartScopeRuleBuilder(List.of(scope)).build();
-			assertEquals(1, rules.size());
+			// 1 read rule + 1 $everything rule (wildcard covers Patient)
+			assertEquals(2, rules.size());
 		}
 	}
 
@@ -196,10 +197,10 @@ class SmartScopeRuleBuilderTest {
 		@Test
 		void nonResourceScopesAreSkippedWhileResourceScopesAreProcessed() {
 			var nonResource = nonResourceScope("openid");
-			var resource = resourceScope("user/Patient.r", SmartScopeContext.USER, "Patient", "r");
+			var resource = resourceScope("user/Observation.r", SmartScopeContext.USER, "Observation", "r");
 			var rules = new SmartScopeRuleBuilder(List.of(nonResource, resource)).build();
 			assertEquals(1, rules.size());
-			assertEquals("user/Patient.r", rules.get(0).getName());
+			assertEquals("user/Observation.r", rules.get(0).getName());
 		}
 
 		@Test
@@ -218,7 +219,74 @@ class SmartScopeRuleBuilderTest {
 			var rules = new SmartScopeRuleBuilder(List.of(patientScope, userScope))
 					.withPatientId(PATIENT_ID)
 					.build();
+			// patient/Observation.r → 1 read rule; user/Patient.r → 1 read rule + 1 $everything rule
+			assertEquals(3, rules.size());
+		}
+	}
+
+	@Nested
+	@DisplayName("$everything operation rules")
+	class EverythingOperation {
+
+		@ParameterizedTest(name = "{0} context with wildcard read produces everything rule")
+		@ValueSource(strings = { "USER", "SYSTEM" })
+		void userAndSystemScopesWithWildcardReadProducesEverythingRule(String contextName) {
+			var context = SmartScopeContext.valueOf(contextName);
+			var scope = resourceScope(contextName.toLowerCase() + "/*.r", context, "*", "r");
+			var rules = new SmartScopeRuleBuilder(List.of(scope)).build();
+			// read rule + $everything rule
 			assertEquals(2, rules.size());
 		}
+
+		@ParameterizedTest(name = "{0} context with patient read produces everything rule")
+		@ValueSource(strings = { "USER", "SYSTEM" })
+		void userAndSystemScopesWithPatientReadProducesEverythingRule(String contextName) {
+			var context = SmartScopeContext.valueOf(contextName);
+			var scope = resourceScope(contextName.toLowerCase() + "/Patient.r", context, "Patient", "r");
+			var rules = new SmartScopeRuleBuilder(List.of(scope)).build();
+			// read rule + $everything rule
+			assertEquals(2, rules.size());
+		}
+
+		@Test
+		void wildcardPatientScopeWithReadProducesEverythingRule() {
+			var scope = resourceScope("patient/*.r", SmartScopeContext.PATIENT, "*", "r");
+			var rules = new SmartScopeRuleBuilder(List.of(scope))
+					.withPatientId(PATIENT_ID)
+					.build();
+			assertEquals(2, rules.size());
+		}
+
+		@Test
+		void patientPatientScopeWithReadProducesEverythingRule() {
+			var scope = resourceScope("patient/Patient.r", SmartScopeContext.PATIENT, "Patient", "r");
+			var rules = new SmartScopeRuleBuilder(List.of(scope))
+					.withPatientId(PATIENT_ID)
+					.build();
+			assertEquals(2, rules.size());
+		}
+
+		@Test
+		void searchOnlyPermissionAlsoProducesEverythingRule() {
+			var scope = resourceScope("user/Patient.s", SmartScopeContext.USER, "Patient", "s");
+			var rules = new SmartScopeRuleBuilder(List.of(scope)).build();
+			assertEquals(2, rules.size());
+		}
+
+		@Test
+		void nonPatientResourceTypeDoesNotProduceEverythingRule() {
+			var scope = resourceScope("user/Observation.r", SmartScopeContext.USER, "Observation", "r");
+			var rules = new SmartScopeRuleBuilder(List.of(scope)).build();
+			assertEquals(1, rules.size());
+		}
+
+		@Test
+		void writeOnlyPermissionOnPatientDoesNotProduceEverythingRule() {
+			var scope = resourceScope("user/Patient.cud", SmartScopeContext.USER, "Patient", "cud");
+			var rules = new SmartScopeRuleBuilder(List.of(scope)).build();
+			// create + write + delete = 3 rules; no $everything because no r or s
+			assertEquals(3, rules.size());
+		}
+
 	}
 }
