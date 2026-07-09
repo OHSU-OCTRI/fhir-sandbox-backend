@@ -14,8 +14,10 @@ data:
   HAPI_FHIR_FHIR_VERSION: R4
   OCTRI_SANDBOX_OAUTH2_AUTHORIZE_ADDRESS: https://octridev.ohsu.edu/fhir-sandbox/oauth2/authorize
   OCTRI_SANDBOX_OAUTH2_ENABLE_TOKEN_AUTH: 'true'
+  OCTRI_SANDBOX_OAUTH2_INTROSPECTION_ADDRESS: https://octridev.ohsu.edu/fhir-sandbox/introspect
   OCTRI_SANDBOX_OAUTH2_ISSUER_ADDRESS: https://octridev.ohsu.edu/fhir-sandbox
   OCTRI_SANDBOX_OAUTH2_JWK_SET_ADDRESS: https://octridev.ohsu.edu/fhir-sandbox/oauth2/jwks
+  OCTRI_SANDBOX_OAUTH2_REVOCATION_ADDRESS: https://octridev.ohsu.edu/fhir-sandbox/oauth2/revoke
   OCTRI_SANDBOX_OAUTH2_TOKEN_ADDRESS: https://octridev.ohsu.edu/fhir-sandbox/oauth2/token
   # TODO: move this to a separate ConfigMap if other config files are needed
   application.properties: |

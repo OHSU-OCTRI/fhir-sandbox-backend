@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added initial JWT authentication (RFS-250)
 - Validate that JWT bearer token has access to the requested partition (RFS-250)
 - Authorize access using SMART scopes included in the JSON web token (RFS-293)
+- Add missing information to SMART configuration response (RFS-302)
 
 ### Changed
 

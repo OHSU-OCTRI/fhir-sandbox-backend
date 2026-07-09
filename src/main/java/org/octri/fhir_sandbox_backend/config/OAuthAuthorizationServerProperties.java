@@ -14,6 +14,8 @@ public class OAuthAuthorizationServerProperties {
 	private String registerAddress;
 	private String jwkSetAddress;
 	private Boolean enableTokenAuth;
+	private String introspectionAddress;
+	private String revocationAddress;
 
 	public String getIssuerAddress() {
 		return issuerAddress;
@@ -63,11 +65,28 @@ public class OAuthAuthorizationServerProperties {
 		this.enableTokenAuth = enableTokenAuth;
 	}
 
+	public String getIntrospectionAddress() {
+		return introspectionAddress;
+	}
+
+	public void setIntrospectionAddress(String introspectionAddress) {
+		this.introspectionAddress = introspectionAddress;
+	}
+
+	public String getRevocationAddress() {
+		return revocationAddress;
+	}
+
+	public void setRevocationAddress(String revocationAddress) {
+		this.revocationAddress = revocationAddress;
+	}
+
 	@Override
 	public String toString() {
 		return "OAuthAuthorizationServerProperties [issuerAddress=" + issuerAddress + ", authorizeAddress="
 				+ authorizeAddress + ", tokenAddress=" + tokenAddress + ", registerAddress=" + registerAddress
-				+ ", jwkSetAddress=" + jwkSetAddress + ", enableTokenAuth=" + enableTokenAuth + "]";
+				+ ", jwkSetAddress=" + jwkSetAddress + ", enableTokenAuth=" + enableTokenAuth + ", introspectionAddress="
+				+ introspectionAddress + ", revocationAddress=" + revocationAddress + "]";
 	}
 
 }
