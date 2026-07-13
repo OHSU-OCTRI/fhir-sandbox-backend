@@ -44,7 +44,30 @@
     <version>0.1.0-SNAPSHOT</version>
     <packaging>war</packaging>
 
-    <name>OCTRI FHIR Sandbox Backend - HAPI FHIR JPA Server</name>
+    <name>fhir-sandbox-backend</name>
+    <description>OCTRI FHIR Sandbox Backend - HAPI FHIR JPA Server</description>
+    <url>https://github.com/OHSU-OCTRI/fhir-sandbox-backend</url>
+
+    <developers>
+        <developer>
+        <name>OCTRI Innovation Core</name>
+        <email>octri-devops@ohsu.edu</email>
+        <organization>Oregon Clinical &amp; Translational Research Institute (OCTRI)</organization>
+        <organizationUrl>https://www.ohsu.edu/octri</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:https://github.com/OHSU-OCTRI/fhir-sandbox-backend.git</connection>
+        <developerConnection>scm:git:https://github.com/OHSU-OCTRI/fhir-sandbox-backend.git</developerConnection>
+        <url>https://github.com/OHSU-OCTRI/fhir-sandbox-backend/tree/main</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/OHSU-OCTRI/fhir-sandbox-backend/issues/</url>
+    </issueManagement>
 
     <distributionManagement>
         <repository>
@@ -52,6 +75,11 @@
             <name>GitHub Packages</name>
             <url>https://maven.pkg.github.com/OHSU-OCTRI/fhir-sandbox-backend</url>
         </repository>
+        <!-- Override setting from HAPI FHIR to ensure commits are pushed to the correct repository -->
+        <site>
+            <id>git.server</id>
+            <url>scm:git:https://github.com/OHSU-OCTRI/fhir-sandbox-backend.git</url>
+        </site>
     </distributionManagement>
 
     <repositories>
@@ -504,6 +532,20 @@
                         <configuration>
                             <mainClass>ca.uhn.fhir.jpa.starter.Application</mainClass>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Create source jar for consistency with other OCTRI projects -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
