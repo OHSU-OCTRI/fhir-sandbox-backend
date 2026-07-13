@@ -52,6 +52,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Dependencies
 
 - Bump `micrometer.version` from 1.16.2 to 1.16.5 ([#12](https://github.com/OHSU-OCTRI/fhir-sandbox-backend/pull/12))
-
-[unreleased]: https://github.com/OCTRI-Apps/fhir-sandbox-backend/compare/v0.1.0...HEAD
-[0.1.0]: https://source.ohsu.edu/OCTRI-Apps/fhir-sandbox-backend/releases/tag/v0.1.0
