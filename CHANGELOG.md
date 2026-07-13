@@ -42,6 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Use FHIR sandbox base URL for audience check instead of full URL with query string (RFS-300)
 - Add `IAuthRule` that authorizes transactions if any other rules are generated (RFS-304)
 - Allow Patient$everything requests if the user has the correct scopes (RFS-310)
+- Override inherited values in pom.xml to fix release issue (CIS-3779)
 
 ### Removed
 
