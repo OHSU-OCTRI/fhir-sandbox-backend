@@ -1,0 +1,23 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fhir-sandbox-backend-stage
+spec:
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+    name: http
+  selector:
+    app: fhir-sandbox-backend-stage
+---
+apiVersion: getambassador.io/v3alpha1
+kind: Mapping
+metadata:
+  name: fhir-sandbox-backend-stage
+spec:
+  hostname: octristage.ohsu.edu
+  prefix: /fhir-sandbox-backend
+  rewrite: /fhir-sandbox-backend
+  service: fhir-sandbox-backend-stage
