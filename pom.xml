@@ -75,7 +75,7 @@
             <name>GitHub Packages</name>
             <url>https://maven.pkg.github.com/OHSU-OCTRI/fhir-sandbox-backend</url>
         </repository>
-        <!-- Override setting from HAPI FHIR to ensure commits to the correct repository -->
+        <!-- Override setting from HAPI FHIR to ensure commits are pushed to the correct repository -->
         <site>
             <id>git.server</id>
             <url>scm:git:https://github.com/OHSU-OCTRI/fhir-sandbox-backend.git</url>
