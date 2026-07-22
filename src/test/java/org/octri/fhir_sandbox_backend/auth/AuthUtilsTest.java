@@ -30,15 +30,7 @@ class AuthUtilsTest {
 			assertEquals(List.of(), result.patientScopes());
 			assertEquals(List.of(), result.userScopes());
 			assertEquals(List.of(), result.systemScopes());
-		}
-
-		@Test
-		void nonResourceScopesAreExcludedFromAllGroups() {
-			var scopes = Set.of(nonResourceScope("openid"), nonResourceScope("launch/patient"));
-			var result = AuthUtils.groupScopesByContext(scopes);
-			assertEquals(List.of(), result.patientScopes());
-			assertEquals(List.of(), result.userScopes());
-			assertEquals(List.of(), result.systemScopes());
+			assertEquals(List.of(), result.nonResourceScopes());
 		}
 
 		@Test
@@ -48,6 +40,7 @@ class AuthUtilsTest {
 			assertEquals(List.of(patientScope), result.patientScopes());
 			assertEquals(List.of(), result.userScopes());
 			assertEquals(List.of(), result.systemScopes());
+			assertEquals(List.of(), result.nonResourceScopes());
 		}
 
 		@Test
@@ -57,6 +50,7 @@ class AuthUtilsTest {
 			assertEquals(List.of(), result.patientScopes());
 			assertEquals(List.of(userScope), result.userScopes());
 			assertEquals(List.of(), result.systemScopes());
+			assertEquals(List.of(), result.nonResourceScopes());
 		}
 
 		@Test
@@ -66,6 +60,17 @@ class AuthUtilsTest {
 			assertEquals(List.of(), result.patientScopes());
 			assertEquals(List.of(), result.userScopes());
 			assertEquals(List.of(systemScope), result.systemScopes());
+			assertEquals(List.of(), result.nonResourceScopes());
+		}
+
+		@Test
+		void nonResourceScopesAreGroupedCorrectly() {
+			var nonResourceScope = nonResourceScope("fhirUser");
+			var result = AuthUtils.groupScopesByContext(Set.of(nonResourceScope));
+			assertEquals(List.of(), result.patientScopes());
+			assertEquals(List.of(), result.userScopes());
+			assertEquals(List.of(), result.systemScopes());
+			assertEquals(List.of(nonResourceScope), result.nonResourceScopes());
 		}
 
 		@Test
@@ -101,20 +106,26 @@ class AuthUtilsTest {
 
 		@Test
 		void nullPatientScopesDefaultsToEmptyList() {
-			var grouped = new AuthUtils.GroupedScopes(null, List.of(), List.of());
+			var grouped = new AuthUtils.GroupedScopes(null, List.of(), List.of(), List.of());
 			assertEquals(List.of(), grouped.patientScopes());
 		}
 
 		@Test
 		void nullUserScopesDefaultsToEmptyList() {
-			var grouped = new AuthUtils.GroupedScopes(List.of(), null, List.of());
+			var grouped = new AuthUtils.GroupedScopes(List.of(), null, List.of(), List.of());
 			assertEquals(List.of(), grouped.userScopes());
 		}
 
 		@Test
 		void nullSystemScopesDefaultsToEmptyList() {
-			var grouped = new AuthUtils.GroupedScopes(List.of(), List.of(), null);
+			var grouped = new AuthUtils.GroupedScopes(List.of(), List.of(), null, List.of());
 			assertEquals(List.of(), grouped.systemScopes());
+		}
+
+		@Test
+		void nullNonResourceScopesDefaultsToEmptyList() {
+			var grouped = new AuthUtils.GroupedScopes(List.of(), List.of(), List.of(), null);
+			assertEquals(List.of(), grouped.nonResourceScopes());
 		}
 	}
 }

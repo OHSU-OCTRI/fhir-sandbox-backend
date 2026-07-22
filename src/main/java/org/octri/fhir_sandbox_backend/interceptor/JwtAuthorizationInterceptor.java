@@ -215,6 +215,18 @@ public class JwtAuthorizationInterceptor extends AuthorizationInterceptor {
 			ruleList.addAll(0, transactionRule);
 		}
 
+		var hasFhirUserScope = groupedScopes.nonResourceScopes().stream()
+					.anyMatch(scope -> "fhirUser".equals(scope.getRawScope()));
+		if (hasFhirUserScope) {
+			// Explicitly allow reading the fhirUser resource
+			var launchContext = getLaunchContext(claims);
+			if (launchContext != null && launchContext.getFhirUser() != null) {
+				var fhirUser = launchContext.getFhirUser();
+				var fhirUserRule = new RuleBuilder().allow("fhirUser rule").read().instance(fhirUser).build();
+				ruleList.addAll(fhirUserRule);
+			}
+		}
+
 		return ruleList;
 	}
 
