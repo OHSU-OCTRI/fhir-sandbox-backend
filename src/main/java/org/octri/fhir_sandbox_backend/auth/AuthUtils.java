@@ -15,7 +15,7 @@ public class AuthUtils {
 	 * Scopes grouped by resource context / compartment.
 	 */
 	public record GroupedScopes(List<SmartScope> patientScopes, List<SmartScope> userScopes,
-			List<SmartScope> systemScopes) {
+			List<SmartScope> systemScopes, List<SmartScope> nonResourceScopes) {
 
 		public GroupedScopes {
 			if (patientScopes == null) {
@@ -28,6 +28,10 @@ public class AuthUtils {
 
 			if (systemScopes == null) {
 				systemScopes = List.of();
+			}
+
+			if (nonResourceScopes == null) {
+				nonResourceScopes = List.of();
 			}
 		}
 
@@ -43,10 +47,9 @@ public class AuthUtils {
 	public static GroupedScopes groupScopesByContext(Set<SmartScope> scopes) {
 		Assert.notNull(scopes, "Scope list is required");
 		var groups = scopes.stream()
-				.filter(SmartScope::isResourceScope)
 				.collect(Collectors.groupingBy(SmartScope::getContext));
 		return new GroupedScopes(groups.get(SmartScopeContext.PATIENT), groups.get(SmartScopeContext.USER),
-				groups.get(SmartScopeContext.SYSTEM));
+				groups.get(SmartScopeContext.SYSTEM), groups.get(SmartScopeContext.NON_RESOURCE));
 	}
 
 }

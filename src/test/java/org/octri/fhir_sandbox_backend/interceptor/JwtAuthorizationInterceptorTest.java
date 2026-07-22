@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
@@ -361,6 +362,73 @@ class JwtAuthorizationInterceptorTest {
 		var transactionRule = rules.stream().filter(rule -> "transaction rule".equals(rule.getName())).findFirst()
 				.orElse(null);
 		assertNotNull(transactionRule, "a rule to allow transactions should be present");
+	}
+
+	@Test
+	void fhirUserScopeReturnsRulesWithLaunchContext() throws ParseException, BadJOSEException, JOSEException {
+		var mockContext = Map.of("id", "mockLaunchId", "clientId", "mockClientId", "fhirUser",
+			"Practitioner/example");
+		var claims = getDefaultClaims()
+				.claim("scope", makeScopeClaim("fhirUser"))
+				.claim("launchContext", mockContext)
+				.build();
+		mockRequestWithClaims(DEFAULT_URL, claims);
+
+		var rules = interceptor.buildRuleList(requestDetails);
+		assertThat(rules).isNotEmpty();
+
+		var fhirUserRule = rules.stream().filter(rule -> "fhirUser rule".equals(rule.getName())).findFirst()
+				.orElse(null);
+		assertNotNull(fhirUserRule, "a rule to allow reading the fhirUser should be present");
+	}
+
+	@Test
+	void fhirUserScopeNoRulesWithoutLaunchContext() throws ParseException, BadJOSEException, JOSEException {
+		var claims = getDefaultClaims()
+				.claim("scope", makeScopeClaim("fhirUser"))
+				.build();
+		mockRequestWithClaims(DEFAULT_URL, claims);
+
+		var rules = interceptor.buildRuleList(requestDetails);
+
+		var fhirUserRule = rules.stream().filter(rule -> "fhirUser rule".equals(rule.getName())).findFirst()
+				.orElse(null);
+		assertNull(fhirUserRule, "a rule to allow reading the fhirUser should not be present");
+	}
+
+	@Test
+	void fhirUserScopeNoRulesWithoutUserInContext() throws ParseException, BadJOSEException, JOSEException {
+		var mockContext = Map.of("id", "mockLaunchId", "clientId", "mockClientId", "patient",
+				"eFTHaVbQzCEwOEE97maN2MC2jJi-r8nnkhRh.umMUlz03");
+		var claims = getDefaultClaims()
+				.claim("scope", makeScopeClaim("fhirUser"))
+				.claim("launchContext", mockContext)
+				.build();
+		mockRequestWithClaims(DEFAULT_URL, claims);
+
+		var rules = interceptor.buildRuleList(requestDetails);
+
+		var fhirUserRule = rules.stream().filter(rule -> "fhirUser rule".equals(rule.getName())).findFirst()
+				.orElse(null);
+		assertNull(fhirUserRule, "a rule to allow reading the fhirUser should not be present");
+	}
+
+	@Test
+	void fhirUserNoRulesWithoutScope() throws ParseException, BadJOSEException, JOSEException {
+		var mockContext = Map.of("id", "mockLaunchId", "clientId", "mockClientId", "fhirUser",
+				"Practitioner/example");
+		// add other non-resource scopes
+		var claims = getDefaultClaims()
+				.claim("scope", makeScopeClaim("launch", "launch/patient"))
+				.claim("launchContext", mockContext)
+				.build();
+		mockRequestWithClaims(DEFAULT_URL, claims);
+
+		var rules = interceptor.buildRuleList(requestDetails);
+
+		var fhirUserRule = rules.stream().filter(rule -> "fhirUser rule".equals(rule.getName())).findFirst()
+				.orElse(null);
+		assertNull(fhirUserRule, "a rule to allow reading the fhirUser should not be present");
 	}
 
 	@Test
