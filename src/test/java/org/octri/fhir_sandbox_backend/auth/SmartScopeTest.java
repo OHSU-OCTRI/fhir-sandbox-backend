@@ -53,28 +53,28 @@ class SmartScopeTest {
 
 		@Test
 		void patientContextReturnsPatient() {
-			assertEquals("patient", resourceScope(SmartScopeContext.PATIENT, "Observation", "rs").getCompartmentName());
+			assertEquals("patient", resourceScope(SmartScopeContext.PATIENT, "Observation", "rs").getContextName());
 		}
 
 		@Test
 		void userContextReturnsUser() {
-			assertEquals("user", resourceScope(SmartScopeContext.USER, "Patient", "r").getCompartmentName());
+			assertEquals("user", resourceScope(SmartScopeContext.USER, "Patient", "r").getContextName());
 		}
 
 		@Test
 		void systemContextReturnsSystem() {
-			assertEquals("system", resourceScope(SmartScopeContext.SYSTEM, "Encounter", "cruds").getCompartmentName());
+			assertEquals("system", resourceScope(SmartScopeContext.SYSTEM, "Encounter", "cruds").getContextName());
 		}
 
 		@Test
 		void nonResourceContextThrows() {
-			assertThrows(IllegalStateException.class, () -> nonResourceScope("openid").getCompartmentName());
+			assertThrows(IllegalStateException.class, () -> nonResourceScope("openid").getContextName());
 		}
 
 		@Test
 		void nullContextThrows() {
 			var scope = new SmartScope("openid", null, null, null, null);
-			assertThrows(IllegalStateException.class, scope::getCompartmentName);
+			assertThrows(IllegalStateException.class, scope::getContextName);
 		}
 	}
 

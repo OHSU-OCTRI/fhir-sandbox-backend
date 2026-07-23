@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r4.model.Patient;
+import org.octri.fhir_sandbox_backend.fhir.CompartmentUtils;
 import org.springframework.util.Assert;
 
 import ca.uhn.fhir.rest.server.interceptor.auth.IAuthRule;
@@ -83,7 +84,7 @@ public class SmartScopeRuleBuilder {
 
 		// r and s both map to HAPI FHIR read, which also covers search.
 		if (scope.allowsRead() || scope.allowsSearch()) {
-			rules.addAll(applyCompartment(scope.getCompartmentName(),
+			rules.addAll(applyCompartment(scope,
 					resourcesOfType(new RuleBuilder().allow(scope.getRawScope()).read(), scope.getResourceType())));
 
 			// $everything is an extended operation on Patient; authorize it when the scope covers Patient resources
@@ -94,17 +95,17 @@ public class SmartScopeRuleBuilder {
 		}
 
 		if (scope.allowsCreate()) {
-			rules.addAll(applyCompartment(scope.getCompartmentName(),
+			rules.addAll(applyCompartment(scope,
 					resourcesOfType(new RuleBuilder().allow(scope.getRawScope()).create(), scope.getResourceType())));
 		}
 
 		if (scope.allowsUpdate()) {
-			rules.addAll(applyCompartment(scope.getCompartmentName(),
+			rules.addAll(applyCompartment(scope,
 					resourcesOfType(new RuleBuilder().allow(scope.getRawScope()).write(), scope.getResourceType())));
 		}
 
 		if (scope.allowsDelete()) {
-			rules.addAll(applyCompartment(scope.getCompartmentName(),
+			rules.addAll(applyCompartment(scope,
 					resourcesOfType(new RuleBuilder().allow(scope.getRawScope()).delete(), scope.getResourceType())));
 		}
 
@@ -129,7 +130,7 @@ public class SmartScopeRuleBuilder {
 	 * @return list containing the {@code $everything} operation rule
 	 */
 	private List<IAuthRule> buildEverythingOperationRule(SmartScope scope) {
-		if ("patient".equals(scope.getCompartmentName())) {
+		if ("patient".equals(scope.getContextName())) {
 			Assert.notNull(patientId, "Patient ID is required for patient-context $everything rule");
 			return new RuleBuilder()
 					.allow(scope.getRawScope())
@@ -152,9 +153,10 @@ public class SmartScopeRuleBuilder {
 		return "*".equals(resourceType) ? op.allResources() : op.resourcesOfType(resourceType);
 	}
 
-	private List<IAuthRule> applyCompartment(String context, IAuthRuleBuilderRuleOpClassifier classifier) {
-		if ("patient".equals(context)) {
-			Assert.notNull(patientId, "Patient ID is required for patient-context scopes");
+	private List<IAuthRule> applyCompartment(SmartScope scope, IAuthRuleBuilderRuleOpClassifier classifier) {
+		if (SmartScopeContext.PATIENT.equals(scope.getContext()) && CompartmentUtils
+				.resourceIsInPatientCompartment(scope.getResourceType())) {
+			Assert.notNull(patientId, "Patient ID is required for patient/* scopes for compartmented resources");
 			return classifier.inCompartment("Patient", patientId).build();
 		}
 		return classifier.withAnyId().build();
