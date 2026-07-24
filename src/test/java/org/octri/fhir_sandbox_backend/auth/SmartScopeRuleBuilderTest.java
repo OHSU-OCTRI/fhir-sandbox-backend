@@ -145,18 +145,25 @@ class SmartScopeRuleBuilderTest {
 	class CompartmentAssignment {
 
 		@Test
-		void patientScopeWithoutPatientIdThrows() {
+		void patientScopeInCompartmentWithoutPatientIdThrows() {
 			var scope = resourceScope("patient/Observation.r", SmartScopeContext.PATIENT, "Observation", "r");
 			var builder = new SmartScopeRuleBuilder(List.of(scope));
 			assertThrows(IllegalArgumentException.class, builder::build);
 		}
 
 		@Test
-		void patientScopeWithPatientIdProducesRules() {
+		void patientScopeInCompartmentWithPatientIdProducesRules() {
 			var scope = resourceScope("patient/Observation.r", SmartScopeContext.PATIENT, "Observation", "r");
 			var rules = new SmartScopeRuleBuilder(List.of(scope))
 					.withPatientId(PATIENT_ID)
 					.build();
+			assertEquals(1, rules.size());
+		}
+
+		@Test
+		void patientScopeOutsideCompartmentWithoutPatientIdProducesRules() {
+			var scope = resourceScope("patient/Practitioner.r", SmartScopeContext.PATIENT, "Practitioner", "r");
+			var rules = new SmartScopeRuleBuilder(List.of(scope)).build();
 			assertEquals(1, rules.size());
 		}
 

@@ -83,15 +83,15 @@ public class SmartScope {
 	}
 
 	/**
-	 * Returns the compartment name derived from the scope context (e.g., {@code "patient"}).
+	 * Returns the name of the scope context (e.g., {@code "patient"}).
 	 *
-	 * @return the lowercase compartment name
+	 * @return the lowercase context name
 	 * @throws IllegalStateException
 	 *            if this is not a resource scope
 	 */
-	public String getCompartmentName() {
+	public String getContextName() {
 		if (!isResourceScope()) {
-			throw new IllegalStateException("Cannot get compartment for non-resource scope");
+			throw new IllegalStateException("Cannot get context for non-resource scope");
 		}
 
 		return context.name().toLowerCase();
