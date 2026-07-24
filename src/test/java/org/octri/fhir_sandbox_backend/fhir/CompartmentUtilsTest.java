@@ -33,7 +33,7 @@ class CompartmentUtilsTest {
 
 		@Test
 		void falseForResourceNotInPatientCompartment() {
-			assertFalse(CompartmentUtils.resourceIsInCompartment(Compartment.PATIENT, "NotARealResource"));
+			assertFalse(CompartmentUtils.resourceIsInCompartment(Compartment.PATIENT, "Practitioner"));
 		}
 
 		@Test
