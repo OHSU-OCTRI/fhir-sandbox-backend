@@ -34,7 +34,7 @@ spec:
         fsGroup: 5333
       containers:
         - name: fhir-sandbox-backend
-          image: ghcr.io/ohsu-octri/fhir-sandbox-backend:0.2.0
+          image: ghcr.io/ohsu-octri/fhir-sandbox-backend:0.3.0
           imagePullPolicy: Always
           securityContext:
             allowPrivilegeEscalation: false
