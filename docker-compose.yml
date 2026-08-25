@@ -1,6 +1,6 @@
 services:
   fhir-backend-jpaserver-start:
-    build: .
+    image: ghcr.io/ohsu-octri/fhir-sandbox-backend
     container_name: fhir-backend-jpaserver-start
     restart: on-failure
     environment:
@@ -11,6 +11,9 @@ services:
       HIBERNATE_DIALECT: ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgresDialect
     ports:
       - "8080:8080"
+      - "8000:8000"
+    volumes:
+      - ./target/ROOT.war:/app.jar
     # Uncomment to enable periodic health checks.
     # Can also be run manually: docker exec fhir-backend-jpaserver-start java -cp /app HealthCheck
     # healthcheck:
@@ -27,7 +30,8 @@ services:
     container_name: fhir-backend-postgres
     restart: always
     ports:
-      - "55432:5432"
+      - "5432:5432"
+      - "55432:55432"
     environment:
       POSTGRES_DB: "hapi"
       POSTGRES_USER: "admin"

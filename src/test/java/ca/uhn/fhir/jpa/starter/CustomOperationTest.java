@@ -20,7 +20,7 @@ import org.springframework.test.context.ActiveProfiles;
 		"spring.datasource.url=jdbc:h2:mem:dbr4",
 		"hapi.fhir.cr_enabled=false",
 		// "hapi.fhir.enable_repository_validating_interceptor=true",
-		"hapi.fhir.fhir_version=r4"
+		"hapi.fhir.fhir_version=r4",
 })
 
 class CustomOperationTest {
@@ -36,7 +36,7 @@ class CustomOperationTest {
 		ctx = FhirContext.forR4();
 		ctx.getRestfulClientFactory().setServerValidationMode(ServerValidationModeEnum.NEVER);
 		ctx.getRestfulClientFactory().setSocketTimeout(1200 * 1000);
-		String ourServerBase = "http://localhost:" + port + "/fhir/";
+		String ourServerBase = "http://localhost:" + port + "/fhir/DEFAULT/";
 		client = ctx.newRestfulGenericClient(ourServerBase);
 
 		// Properties props = new Properties();
