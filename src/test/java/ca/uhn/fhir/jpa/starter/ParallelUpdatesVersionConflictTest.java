@@ -33,7 +33,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 	"spring.datasource.url=jdbc:h2:mem:dbr4",
 	"hapi.fhir.fhir_version=r4",
 	"hapi.fhir.userRequestRetryVersionConflictsInterceptorEnabled=true",
-	"spring.jpa.properties.hibernate.search.backend.directory.type=local-heap"
+	"spring.jpa.properties.hibernate.search.backend.directory.type=local-heap",
+	"octri.sandbox.oauth2.enable-token-auth=false"
 })
 
 /**

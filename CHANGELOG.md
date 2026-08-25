@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Rewrite README.md to better reflect the changes made since forking from hapifhir/hapi-fhir-jpaserver-starter. (RFS-321)
+- Update config and documentation to remove OHSU-specific configuration and clarify setup for new users. (RFS-321)
+
+### Removed
+
+- Remove OHSU-specific deployment files. (RFS-321)
+
 ## [0.3.0] - 2026-07-28
 
 ### Fixed
