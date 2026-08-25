@@ -1,11 +1,11 @@
 # Release Workflow
 
-This document describes how to release the OCTRI authentication library (AuthLib). This will:
+This document describes how to release the OCTRI FHIR Sandbox backend application. This will:
 
 * Advance the version in the `pom.xml` files
 * Add the new version to `CHANGELOG.md`
 * Tag the new version and create a GitHub release with notes sourced from `CHANGELOG.md`
-* Build release artifacts and deploy them to GitHub Packages and Maven Central
+* Build release artifacts and deploy them to GitHub Packages and GitHub Container Registry
 
 You must have write access to the repository to make a release.
 
