@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Notify fhir-sandbox-backend-devops repository when new images are pushed (CIS-3850)
+
 ### Changed
 
 - Rewrite README.md to better reflect the changes made since forking from hapifhir/hapi-fhir-jpaserver-starter. (RFS-321)
