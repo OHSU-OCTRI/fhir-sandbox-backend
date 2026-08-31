@@ -24,3 +24,15 @@ jobs:
       artifact_name: ${{ github.sha }}-jar
       artifact_path: target
     secrets: inherit
+
+  notify-devops-repo:
+    name: Notify DevOps repo of new image
+    needs: build-container-image
+    uses: OHSU-OCTRI/shared-workflows/.github/workflows/new-image-notification.yaml@main
+    with:
+      notify_repo: ${{ vars.DEVOPS_REPO }}
+      image_name: ${{ vars.IMAGE_NAME }}
+      image_digest: ${{ needs.build-container-image.outputs.digest }}
+      version_tag: ${{ case(github.ref_type == 'tag', github.ref_name, '') }}
+    secrets:
+      dispatch_token: ${{ secrets.REPO_DISPATCH_TOKEN }}
