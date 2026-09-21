@@ -20,5 +20,4 @@ jobs:
       version: ${{ inputs.version }}
       development_version: ${{ inputs.development_version }}
       java_version: '17'
-      update_manifests: true
     secrets: inherit
