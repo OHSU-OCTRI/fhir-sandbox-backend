@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-09-24
+
 ### Fixed
 
 - Remove `update_manifests` flag from release workflow to fix release failure. (RFS-332)
@@ -88,7 +90,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Bump `micrometer.version` from 1.16.2 to 1.16.5 ([#12](https://github.com/OHSU-OCTRI/fhir-sandbox-backend/pull/12))
 
-[unreleased]: https://github.com/OHSU-OCTRI/fhir-sandbox-backend/compare/v0.4.0...HEAD
+[unreleased]: https://github.com/OHSU-OCTRI/fhir-sandbox-backend/compare/v0.4.1...HEAD
+[0.4.1]: https://github.com/OHSU-OCTRI/fhir-sandbox-backend/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/OHSU-OCTRI/fhir-sandbox-backend/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/OHSU-OCTRI/fhir-sandbox-backend/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/OHSU-OCTRI/fhir-sandbox-backend/compare/v0.1.0...v0.2.0
