@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Remove `update_manifests` flag from release workflow to fix release failure. (RFS-332)
+
 ## [0.4.0] - 2026-09-21
 
 ### Added
